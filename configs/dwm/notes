@@ -1,0 +1,46 @@
+/* Key definitions */
+#define MODKEY Mod1Mask
+
+/* Commands */
+static const char *rofidrun[] = { "rofi", "-show", "drun", NULL };
+
+/* Key bindings */
+static Key keys[] = {
+    /* modifier                     key        function        argument */
+    { MODKEY,                       XK_p,      spawn,          {.v = rofidrun } },
+    // other key bindings...
+};
+
+sudo make clean install
+
+-----------------------------------
+
+create_st_desktop_entry() {
+    # Path to the .desktop file
+    local desktop_file="/usr/share/applications/st.desktop"
+
+    # Check if the user has sudo privileges
+    if ! sudo -v; then
+        echo "You need sudo privileges to create the .desktop file."
+        return 1
+    fi
+
+    # Create the .desktop file
+    sudo tee "$desktop_file" > /dev/null <<EOL
+[Desktop Entry]
+Name=st
+Comment=Suckless Simple Terminal
+Exec=st
+Terminal=false
+Type=Application
+Categories=Utility;TerminalEmulator;
+EOL
+
+    # Update the desktop database
+    sudo update-desktop-database
+
+    echo "st.desktop file created and desktop database updated."
+}
+
+
+---------------------------------------------

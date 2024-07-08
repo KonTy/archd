@@ -1,0 +1,193 @@
+#!/bin/bash
+. ~/.config/configs/hyprv.conf
+
+function set_monitors() {
+    # Get the list of monitors
+    monitors=$(hyprctl monitors | grep "name:" | awk '{print $2}')
+
+    # Loop through each monitor and set the highest resolution
+    for monitor in $monitors; do
+        highest_resolution=$(hyprctl monitors | grep "$monitor" -A 10 | grep "modes:" -A 1 | tail -1 | awk '{print $1}')
+        hyprctl dispatch dpms "$monitor" "$highest_resolution"
+    done
+}
+
+function get_theme() {
+    # Check which waybar theme is set
+    THEMEIS=$(readlink -f ~/.config/waybar/style.css | cut -d '-' -f3)
+
+    #if the theme is not dark then we need to switch to it
+    if [[ $THEMEIS == "dark.css" ]]; then
+        SWITCHTO="-dark"
+        MODESTR="Dark"
+    else
+        SWITCHTO=""
+        MODESTR="Light"
+    fi
+}
+
+function update_theme() {
+    #set the xfce and GTK theme
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
+    gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark"
+    xfconf-query -c xsettings -p /Net/ThemeName -s "Adwaita-Dark"
+    gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-Dark"
+}
+
+function get_ver() {
+    VER=$(readlink -f ~/.config/waybar/config | cut -d '-' -f1 | cut -d '/' -f8)
+}
+
+function restart_waybar() {
+    #restart the waybar
+    pkill waybar
+    waybar --config ~/.config/configs/waybar/config
+}
+
+# journalctl -t hypr
+# journalctl | grep '^hypr:'
+function set_current_background_hypr() {
+    # Directory containing the background images
+    BACKGROUND_DIR="$HOME/.config/configs/backgrounds"
+
+    # Log function call
+    logger -t hypr "hypr: set_current_background called"
+
+    # Select a random .jpg file from the directory
+    randombackground=$(find "$BACKGROUND_DIR" -type f -name '*.jpg' | shuf -n 1)
+
+    # Check if a background image was selected
+    if [ -n "$randombackground" ]; then
+        logger -t hypr "hypr: Running preload command: hyprctl hyprpaper preload $randombackground"
+        hyprctl hyprpaper preload "$randombackground"
+        if [ $? -ne 0 ]; then
+            logger -t hypr "hypr: Preload command failed"
+        fi
+
+        logger -t hypr "hypr: Running wallpaper command: hyprctl hyprpaper wallpaper ,$randombackground"
+        hyprctl hyprpaper wallpaper ,"$randombackground"
+        if [ $? -ne 0 ]; then
+            logger -t hypr "hypr: Wallpaper command failed"
+        fi
+
+    else
+        logger -t hypr "hypr: No background selected"
+    fi
+}
+
+function set_current_background_swww() {
+    # Directory containing the background images
+    BACKGROUND_DIR="$HOME/.config/configs/backgrounds"
+
+    # Log function call
+    logger -t hypr "hypr: set_current_background called"
+
+    # Check if a specific background image is provided
+    if [ -n "$1" ]; then
+        selected_background="$BACKGROUND_DIR/$1"
+    else
+        # Select a random .jpg file from the directory
+        selected_background=$(find "$BACKGROUND_DIR" -type f -name '*.jpg' | shuf -n 1)
+    fi
+
+    # Check if a background image was selected
+    if [ -n "$selected_background" ]; then
+        logger -t hypr "hypr: Running swww img $selected_background"
+
+        swww img "$selected_background" --transition-type fade --transition-duration 0.5
+        # --transition-fps 60 --transition-type left --transition-duration 0.3
+        if [ $? -ne 0 ]; then
+            logger -t hypr "hypr: swww img FAILURE $?"
+        fi
+    else
+        logger -t hypr "hypr: No background selected"
+    fi
+}
+
+function hide_active_window() {
+    # Get the active window's ID
+    ACTIVE_WINDOW=$(hyprctl activewindow -j | jq -r '.address')
+
+    # Get the active workspace of the focused monitor
+    ACTIVE_WORKSPACE=$(hyprctl monitors | grep "focused: yes" -A 1 | grep workspace | awk '{print $2}')
+
+    # Get the workspace of the active window
+    WINDOW_WORKSPACE=$(hyprctl clients | grep -A 3 "window $ACTIVE_WINDOW" | grep workspace | awk '{print $2}')
+
+    if [ "$WINDOW_WORKSPACE" == "10" ]; then
+        # Move window to the active workspace
+        hyprctl dispatch movetoworkspace "$ACTIVE_WORKSPACE" "$ACTIVE_WINDOW"
+    else
+        # Move window to workspace 10
+        hyprctl dispatch movetoworkspace 10 "$ACTIVE_WINDOW"
+    fi
+}
+
+# Define an array of hex color codes from bright green to dark green
+colors=(
+    "0xff00ff00" # Bright Green
+    "0xff00ee00" # Green
+    "0xff00dd00" # Slightly Darker Green
+    "0xff00cc00" # Slightly Darker Green
+    "0xff00bb00" # Slightly Darker Green
+    "0xff00aa00" # Slightly Darker Green
+    "0xff009900" # Slightly Darker Green
+    "0xff008800" # Slightly Darker Green
+    "0xff007700" # Slightly Darker Green
+    "0xff006600" # Slightly Darker Green
+    "0xff005500" # Dark Green
+)
+
+function random_hex() {
+    # Select a random color from the array
+    random_index=$((RANDOM % ${#colors[@]}))
+    echo ${colors[$random_index]}
+}
+
+function set_random_border() {
+    hyprctl keyword general:col.active_border \
+        $(random_hex) $(random_hex) $(random_hex) $(random_hex) $(random_hex) \
+        $(random_hex) $(random_hex) $(random_hex) $(random_hex) $(random_hex) 90deg
+    
+     hyprctl keyword general:col.inactive_border \
+        ${colors[3]} 45deg
+}
+
+function switch_keyboard() {
+    hyprctl switchxkblayout $SET_KB next
+}
+
+if [[ "$1" == "hideactivewin" ]]; then
+    hide_active_window
+elif [[ "$1" == "setbg" ]]; then
+    set_current_background_swww "$2"
+    # update_theme
+    #restart_waybar
+elif [[ "$1" == "setmonitors" ]]; then
+    set_monitors
+    update_theme
+    #restart_waybar
+elif [[ "$1" == "swkb" ]]; then
+    switch_keyboard
+    #restart_waybar
+elif [[ "$1" == "setborder" ]]; then
+    set_random_border
+fi
+
+
+# need to show the version and tooltip
+get_ver
+
+TOOLTIP='Default Keybinds\n'\
+'SUPER + Q = Start Kitty\n'\
+'SUPER + F4 = Close Window\n'\
+'SUPER + L = Lock Screen\n'\
+'SUPER + M = Logout menu\n'\
+'SUPER + E = File Manager\n'\
+'SUPER + V = Toggle Float\n'\
+'SUPER + SPACE = App Launcher\n'\
+'SUPER + S = Screenshot\n'\
+'SUPER + T = Switch HyprV version\n'\
+'ALT + V = Open clipboard manager'
+
+echo '{"text": "'$VER'", "tooltip": "'$TOOLTIP'"}'

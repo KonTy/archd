@@ -1,0 +1,13 @@
+configuration {
+    font: "DejaVu Sans Mono 12";
+    modi: "window,run,ssh,drun";
+    sidebar-mode: false;
+    lines: 10;
+    columns: 1;
+    width: 50;
+    location: 0;
+    padding: 5;
+    fixed-num-lines: true;
+    show-icons: true;
+    theme: "~/.config/rofi/theme.rasi";
+}

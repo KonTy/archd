@@ -1,0 +1,8 @@
+* {
+    background: #282c34;
+    foreground: #abb2bf;
+    border: 1px solid #61afef;
+    selected-background: #61afef;
+    selected-foreground: #282c34;
+    font: "DejaVu Sans Mono 12";
+}
