@@ -47,8 +47,6 @@ cd "$(dirname "$0")"
 
 # https://github.com/bakkeby/dwm-flexipatch
 
-pkill dwm
-
 ISNVIDIA=false
 
 # https://wiki.hyprland.org/Useful-Utilities/Must-have/
@@ -664,4 +662,5 @@ if [[ "$ISNVIDIA" == true ]]; then
 fi
 
 echo "Starting dwm..."
+# pkill dwm
 # startx  
