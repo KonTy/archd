@@ -43,9 +43,13 @@ cd "$(dirname "$0")"
 # echo 'GRUB_CMDLINE_LINUX_DEFAULT="quiet resume=/dev/mapper/$(lsblk -no UUID $DEVICE-crypt)"' | tee -a /etc/default/grub
 # grub-mkconfig -o /boot/grub/grub.cfg
 
-# sudo usermod -a -G audio $USER
 
-pkill waybar
+
+# https://github.com/bakkeby/dwm-flexipatch
+
+pkill dwm
+
+ISNVIDIA=false
 
 # https://wiki.hyprland.org/Useful-Utilities/Must-have/
 # for XDPH doesn’t implement a file picker. For that, I recommend installing xdg-desktop-portal-gtk alongside XDPH.
@@ -60,32 +64,19 @@ declare -A prep_stage=(
     [gvfs]="GNOME Virtual File System support for NTFS and other file systems"
     [xorg-server]="Xorg Server"
     [sddm]="Display Manager"
+    [rofi]="A window switcher, application launcher, and dmenu replacement for X11."
     [alacritty]="Terminal Emulator"
     [dmenu]="Dynamic Menu"
-    [alsa-utils]="ALSA Utilities"
+    [Dunst]="notification service"
     [networkmanager]="Network Manager"
+    [slock]="Locking app"
     [xclip]="Command-line interface to X selections"
     [xsel]="Command-line tool to access X clipboard and selection buffers"
-
-)
-
-declare -A hyprpaper_stage=(
-    [hyprpaper]="Wall paper support"
-    [gcc]="GNU Compiler Collection"
-    [ninja]="Small build system with a focus on speed"
-    [wayland-protocols]="Wayland protocols"
-    [libjpeg-turbo]="JPEG image library"
-    [libwebp]="WebP image library"
-    [pango]="Text layout and rendering library"
-    [cairo]="2D graphics library"
-    [pkgconf]="Package compiler and linker metadata toolkit"
-    [cmake]="Cross-platform make"
-    [libglvnd]="The GL Vendor-Neutral Dispatch library"
-    [wayland]="Wayland display server protocol"
-)
-
-declare -A swww_stage=(
-    [swww]="Change background"
+    [libxinerama]="X11 Xinerama extension library"
+    [xorg-server]="X.Org X server"
+    [xorg-xinit]="X.Org initialization program"
+    [xorg-xrandr]="X.Org XRandR extension library"
+    [xorg-xsetroot]="X.Org utility to set the root window properties"
 )
 
 declare -A audio_stage=(
@@ -111,23 +102,14 @@ declare -A nvidia_stage=(
 
 #the main packages
 declare -A install_stage=(
-    [hyprland]="Desktop manager"
     [sddm]="Simple Desktop Display Manager"
-    [waybar]="Highly customizable Wayland bar for Sway and Wlroots based compositors"
-    [wofi]="Application launcher for Wayland"
     [kitty]="A fast, feature-rich, GPU-based terminal emulator"
     [starship]="Cross-shell prompt for astronauts"
-    [mako]="Lightweight notification daemon for Wayland"
-    [swappy]="A Wayland native snapshot editing tool"
-    [grim]="Grab images from a Wayland compositor"
-    [slurp]="Select a region in a Wayland compositor"
     [mc]="Midnight commander terminal file manager"
     [thunderbird]="Email client from Mozilla"
     [brave-bin]="Brave browser"
     [mpv]="Media player"
     [fastfetch]="Show system info"
-    [wl-clipboard]="Clipboard manager for Wayland"
-    [clipman]="Clipboard manager with ability to keep onlh one item, use cliphist if you want more"
 )
 
 declare -A optional_stage=(
@@ -152,7 +134,21 @@ INSTLOG="install.log"
 
 ######
 
-add_dwm_to_sddm() {
+function setup_dwm() {
+    # Change to dwm directory
+    cd ./dwm || { echo "Error: ./dwm directory not found."; exit 1; }
+
+    # Compile dwm
+    sudo make clean install || { echo "Error: Compilation failed."; exit 1; }
+
+    # Change back to original directory
+    cd - >/dev/null || exit
+
+    echo "DWM compiled and installed successfully."
+}
+
+
+function add_dwm_to_sddm() {
     # Check if dwm.desktop file already exists
     if [ ! -f /usr/share/xsessions/dwm.desktop ]; then
         # Create the dwm.desktop file
@@ -199,12 +195,6 @@ EOF
     echo "dwm has been added as an option to SDDM."
     echo "You can now select dwm from the session list on the SDDM login screen."
 }
-
-# Call the function
-add_dwm_to_sddm
-
-
-
 
 function setup_dark_theme() {
     # Environment Variables
@@ -306,7 +296,7 @@ function show_progress() {
         sleep 2
     done
     echo -en "Done!\n"
-sleep 2
+    sleep 2
 }
 
 function install_software() {
@@ -356,75 +346,176 @@ function make_scripts_executable() {
     done
 }
 
+setup_slock_for_dwm() {
+    # Install slock if not already installed
+    sudo pacman -S --needed slock
+
+   # Check if ~/.xinitrc exists and does not already contain slock setup
+    if [ -f ~/.xinitrc ] && ! grep -q 'slock' ~/.xinitrc; then
+        # Add slock setup to ~/.xinitrc
+        cat >> ~/.xinitrc <<'EOF'
+
+# Start slock to handle screen locking
+slock &
+
+EOF
+        echo "slock setup added to ~/.xinitrc."
+    else
+        echo "slock setup already exists in ~/.xinitrc or ~/.xinitrc does not exist."
+    fi
+
+    # Make ~/.xinitrc executable
+    chmod +x ~/.xinitrc
+}
+
+
+setup_hibernation_after_idle() {
+    # Adjusting Timeout Values
+    # Screen Off Timeout: You can adjust the screen off timeout by changing the delay in xset dpms force off command (e.g., xset dpms 300 for 5 minutes).
+    # Hibernation Timeout: Modify OnUnitActiveSec= in the hibernate-after-idle.timer file to change the hibernation timeout.
+
+    # Check if hibernate-after-idle.service already exists
+    if ! sudo systemctl cat hibernate-after-idle.service > /dev/null 2>&1; then
+        # Create hibernate-after-idle.service
+        sudo tee /etc/systemd/system/hibernate-after-idle.service > /dev/null <<EOF
+[Unit]
+Description=Hibernate after idle
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c 'sleep 600 && systemctl hibernate'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+        echo "Hibernate after idle service setup completed."
+    else
+        echo "Hibernate after idle service already exists."
+    fi
+
+    # Check if hibernate-after-idle.timer already exists
+    if ! sudo systemctl cat hibernate-after-idle.timer > /dev/null 2>&1; then
+        # Create hibernate-after-idle.timer
+        sudo tee /etc/systemd/system/hibernate-after-idle.timer > /dev/null <<EOF
+[Unit]
+Description=Hibernate after idle timer
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target
+EOF
+        echo "Hibernate after idle timer setup completed."
+    else
+        echo "Hibernate after idle timer already exists."
+    fi
+
+    # Reload systemd
+    sudo systemctl daemon-reload
+
+    # Enable and start hibernate-after-idle.timer
+    sudo systemctl enable --now hibernate-after-idle.timer
+
+    echo "System will hibernate after 10 minutes of inactivity."
+}
+
+function install_nvidia() {
+    # find the Nvidia GPU
+    if lspci -k | grep -A 2 -E "(VGA|3D)" | grep -iq nvidia; then
+        ISNVIDIA=true
+    else
+        ISNVIDIA=false
+    fi
+
+    # Setup Nvidia if it was found
+    if [[ "$ISNVIDIA" == true ]]; then
+        echo -e "$CNT - Nvidia GPU support setup stage..."
+        install_software nvidia_stage
+
+        # update config
+        sudo sed -i 's/MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+        sudo mkinitcpio --config /etc/mkinitcpio.conf --generate /boot/initramfs-custom.img
+        echo -e "options nvidia-drm modeset=1" | sudo tee -a /etc/modprobe.d/nvidia.conf &>> $INSTLOG
+    fi
+}
+
+function install_yay() {
+    #### Check for package manager ####
+    if [ ! -f /sbin/yay ]; then  
+        echo -en "$CNT - Configuering yay."
+        git clone https://aur.archlinux.org/yay.git &>> $INSTLOG
+        cd yay
+        makepkg -si --noconfirm &>> ../$INSTLOG &
+        show_progress $!
+        if [ -f /sbin/yay ]; then
+            echo -e "\e[1A\e[K$COK - yay configured"
+            cd ..
+            
+            # update the yay database
+            echo -en "$CNT - Updating yay."
+            yay -Suy --noconfirm --combinedupgrade --combinedupgrade &>> $INSTLOG &
+            show_progress $!
+            echo -e "\e[1A\e[K$COK - yay updated."
+        else
+            # if this is hit then a package is missing, exit to review log
+            echo -e "\e[1A\e[K$CER - yay install failed, please check the install.log"
+            exit
+        fi
+    fi
+}
+
+function setup_dunst() {
+    # Check if ~/.xinitrc exists and does not already contain dunst setup
+    if [ -f ~/.xinitrc ] && ! grep -q 'dunst &' ~/.xinitrc; then
+        # Add dunst setup to ~/.xinitrc
+        cat >> ~/.xinitrc <<'EOF'
+# Start Dunst for notifications
+dunst &
+EOF
+        echo "Dunst setup added to ~/.xinitrc."
+    else
+        echo "Dunst setup already exists in ~/.xinitrc or ~/.xinitrc does not exist."
+    fi
+
+    ln -sf ~/.config/configs/dunst/dunstrc ~/.config/dunst/dunstrc
+}
+
+
+function is_vm() {
+    # attempt to discover if this is a VM or not
+    echo -e "$CNT - Checking for Physical or VM..."
+    ISVM=$(hostnamectl | grep Chassis)
+    echo -e "Using $ISVM"
+    if [[ $ISVM == *"vm"* ]]; then
+        echo -e "$CWR - Please note that VMs are not fully supported and if you try to run this on
+        a Virtual Machine there is a high chance this will fail."
+        sleep 1
+    fi
+}
+
 # clear the screen
 clear
 
 echo -e "$CNT - Setup starting..."
-# sudo touch /tmp/configs.tmp
-
-# attempt to discover if this is a VM or not
-echo -e "$CNT - Checking for Physical or VM..."
-ISVM=$(hostnamectl | grep Chassis)
-echo -e "Using $ISVM"
-if [[ $ISVM == *"vm"* ]]; then
-    echo -e "$CWR - Please note that VMs are not fully supported and if you try to run this on
-    a Virtual Machine there is a high chance this will fail."
-    sleep 1
-fi
-
-# find the Nvidia GPU
-if lspci -k | grep -A 2 -E "(VGA|3D)" | grep -iq nvidia; then
-    ISNVIDIA=true
-else
-    ISNVIDIA=false
-fi
-
-#### Check for package manager ####
-if [ ! -f /sbin/yay ]; then  
-    echo -en "$CNT - Configuering yay."
-    git clone https://aur.archlinux.org/yay.git &>> $INSTLOG
-    cd yay
-    makepkg -si --noconfirm &>> ../$INSTLOG &
-    show_progress $!
-    if [ -f /sbin/yay ]; then
-        echo -e "\e[1A\e[K$COK - yay configured"
-        cd ..
-        
-        # update the yay database
-        echo -en "$CNT - Updating yay."
-        yay -Suy --noconfirm --combinedupgrade --combinedupgrade &>> $INSTLOG &
-        show_progress $!
-        echo -e "\e[1A\e[K$COK - yay updated."
-    else
-        # if this is hit then a package is missing, exit to review log
-        echo -e "\e[1A\e[K$CER - yay install failed, please check the install.log"
-        exit
-    fi
-fi
-
+is_vm
+install_yay
 # Call the install function with all package names
 echo -e "$CNT - Prep Stage - Installing needed components"
 install_software prep_stage
-
-echo -e "$CNT - Prep Stage - Installing hypprpaper components"
-install_software swww_stage
-
 echo -e "$CNT - Audio Stage - Installing audio components"
 install_software audio_stage
+install_nvidia
 
-# Setup Nvidia if it was found
-if [[ "$ISNVIDIA" == true ]]; then
-    echo -e "$CNT - Nvidia GPU support setup stage..."
-    install_software nvidia_stage
+setup_dwm
+add_dwm_to_sddm
+setup_hibernation_after_idle
+setup_dunst
 
-    # update config
-    sudo sed -i 's/MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
-    sudo mkinitcpio --config /etc/mkinitcpio.conf --generate /boot/initramfs-custom.img
-    echo -e "options nvidia-drm modeset=1" | sudo tee -a /etc/modprobe.d/nvidia.conf &>> $INSTLOG
-fi
 
-echo -e "$CNT - Installing main components..."
-install_software install_stage
+# echo -e "$CNT - Installing main components..."
+# install_software install_stage
 
 # Start the bluetooth service
 # echo -e "$CNT - Starting the Bluetooth Service..."
@@ -432,76 +523,61 @@ install_software install_stage
 # sleep 2
    
 # Clean out other portals
-echo -e "$CNT - Cleaning out conflicting xdg portals..."
-yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
+# echo -e "$CNT - Cleaning out conflicting xdg portals..."
+# yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
 
 echo -e "$CNT - Copying config files..."
-
 # copy the configs directory
 cp -R -u configs ~/.config/
-
-#set the measuring unit for waybar
-echo -e "$CNT - Attempring to set mesuring unit..."
-if locale -a | grep -q ^en_US; then
-    echo -e "$COK - Setting mesuring system to imperial..."
-    ln -sf ~/.config/configs/waybar/mesu-imp.jsonc ~/.config/configs/waybar/mesu.jsonc
-    sed -i 's/SET_MESU=""/SET_MESU="I"/' ~/.config/configs/hyprv.conf
-else
-    echo -e "$COK - Setting mesuring system to metric..."
-    sed -i 's/SET_MESU=""/SET_MESU="M"/' ~/.config/configs/hyprv.conf
-    ln -sf ~/.config/configs/waybar/mesu-met.jsonc ~/.config/configs/waybar/mesu.jsonc
-fi
-
-# link up the config files
+# ********************************************************************
+# Config files 
+# ********************************************************************
 echo -e "$CNT - Setting up the new config..." 
 cp -R -u -f ~/.config/configs/hypr/* ~/.config/hypr/
 ln -sf ~/.config/configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
 ln -sf ~/.config/configs/mako/conf/config ~/.config/mako/config
-ln -sf ~/.config/configs/swaylock/config ~/.config/swaylock/config
-ln -sf ~/.config/configs/waybar/config ~/.config/waybar/config
-ln -sf ~/.config/configs/waybar/style.css ~/.config/waybar/style.css
+
 ln -sf ~/.config/configs/wlogout/layout ~/.config/wlogout/layout
-ln -sf ~/.config/configs/wofi/config ~/.config/wofi/config
-ln -sf ~/.config/configs/wofi/style/style.css ~/.config/wofi/style.css
+
+ln -sf ~/.config/configs/rofi/config.rasi ~/.config/rofi/config.rasi
+ln -sf ~/.config/configs/rofi/theme.rasi ~/.config/rofi/theme.rasi
 
 sudo cp -f -u ~/.config/configs/mc/ini ~/.config/mc/ini 
 sudo cp -f -u ~/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
 
-mkdir -p ~/.themes
-cp -r -f -d -u ~/.config/configs/gtktheme/Arc-BLACKEST ~/.themes/
-xfconf-query -c xsettings -p /Net/ThemeName -s "BWnB-GTK"
-xfconf-query -c xsettings -p /Net/IconThemeName -s "BWnB-GTK"
-xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "BWnB-GTK"
+# ********************************************************************
+# setup the first look and feel as dark
+# ********************************************************************
+
+# mkdir -p ~/.themes
+# cp -r -f -d -u ~/.config/configs/gtktheme/Arc-BLACKEST ~/.themes/
+# xfconf-query -c xsettings -p /Net/ThemeName -s "BWnB-GTK"
+# xfconf-query -c xsettings -p /Net/IconThemeName -s "BWnB-GTK"
+# xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "BWnB-GTK"
 
 #setup_dark_theme
 #install_custom_theme
+# xfconf-query -c xsettings -p /Net/ThemeName -s "Adwaita-dark"
+# xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
+# gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+# gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark"
+# cp -f ~/.config/configs/backgrounds/background-dark.jpg /usr/share/sddm/themes/sdt/wallpaper.jpg
 
+# ********************************************************************
+# Install the starship shell 
+# ********************************************************************
+echo -e "$CNT - Install Starship"
+echo -e "$CNT - Updating .bashrc..."
+add_if_not_exists 'eval "$(starship init bash)"' ~/.bashrc
+add_if_not_exists 'eval "$(starship init zsh)"' ~/.zshrc
+echo -e "$CNT - copying starship config file to ~/.config ..."
+mkdir -p ~/.config
+cp -f -u configs/starship/starship.toml ~/.config/
 
-# add the Nvidia env file to the config (if needed)
-if [[ "$ISNVIDIA" == true ]]; then
-    echo -e "\nsource = ~/.config/hypr/env_var_nvidia.conf" >> ~/.config/hypr/hyprland.conf
-fi
-
-WLDIR=/usr/share/wayland-sessions
-if [ -d "$WLDIR" ]; then
-    echo -e "$COK - $WLDIR found"
-else
-    echo -e "$CWR - $WLDIR NOT found, creating..."
-    sudo mkdir $WLDIR
-fi 
-
-# stage the .desktop file, which is used by SDDM to show it during login
-sudo tee /usr/share/wayland-sessions/hyprland.desktop > /dev/null << 'EOF'
-[Desktop Entry]
-Name=Hyprland
-Comment=An intelligent dynamic tiling Wayland compositor
-Exec=Hyprland
-Type=Application
-EOF
-
-
-# Copy the SDDM theme
+# ********************************************************************
+# sddm section
+# ********************************************************************
 echo -e "$CNT - Setting up the login screen."
 sudo cp -R -u sddm/TerminalStyleLogin /usr/share/sddm/themes/
 sudo chown -R $USER:$USER /usr/share/sddm/themes/TerminalStyleLogin
@@ -509,27 +585,18 @@ sudo mkdir /etc/sddm.conf.d
 echo -e "[Theme]\nCurrent=TerminalStyleLogin" | sudo tee -a /etc/sddm.conf.d/10-theme.conf &>> $INSTLOG
 
 
-# setup the first look and feel as dark
-# xfconf-query -c xsettings -p /Net/ThemeName -s "Adwaita-dark"
-# xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
-# gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
-# gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark"
-# cp -f ~/.config/configs/backgrounds/background-dark.jpg /usr/share/sddm/themes/sdt/wallpaper.jpg
+# Enable the sddm login manager service
+echo -e "$CNT - Enabling the SDDM Service..."
+sudo systemctl enable sddm &>> $INSTLOG
+sleep 2
 
-make_scripts_executable "$HOME/.config/configs/waybar/scripts"
-make_scripts_executable "$HOME/.config/configs/hypr/scripts"
+exec sudo systemctl start sddm &>> $INSTLOG
 
-### Install the starship shell ###
-echo -e "$CNT - Install Starship"
-echo -e "$CNT - Updating .bashrc..."
+sudo usermod -a -G audio $USER
 
-add_if_not_exists 'eval "$(starship init bash)"' ~/.bashrc
-add_if_not_exists 'eval "$(starship init zsh)"' ~/.zshrc
-echo -e "$CNT - copying starship config file to ~/.config ..."
-mkdir -p ~/.config
-cp -f -u configs/starship/starship.toml ~/.config/
-
-### Script is done ###
+# ********************************************************************
+# done
+# ********************************************************************
 echo -e "$CNT - Script had completed!"
 if [[ "$ISNVIDIA" == true ]]; then 
     echo -e "$CAT - Since we attempted to setup an Nvidia GPU the script will now end and you should reboot.
@@ -537,9 +604,5 @@ if [[ "$ISNVIDIA" == true ]]; then
     exit
 fi
 
-# Enable the sddm login manager service
-echo -e "$CNT - Enabling the SDDM Service..."
-sudo systemctl enable sddm &>> $INSTLOG
-sleep 2
-
-exec sudo systemctl start sddm &>> $INSTLOG
+echo "Starting dwm..."
+startx  

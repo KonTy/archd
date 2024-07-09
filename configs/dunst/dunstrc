@@ -1,0 +1,22 @@
+# Dunst configuration file
+
+[global]
+font = Monospace 10
+markup = full
+format = "<b>%s</b>\n%b"
+
+# Customize colors as per your preference
+[urgency_low]
+foreground = #ffffff
+background = #333333
+
+[urgency_normal]
+foreground = #ffffff
+background = #285577
+
+[urgency_critical]
+foreground = #ffffff
+background = #ff3333
+
+# Specify the monitor where notifications should appear (optional)
+# monitor = HDMI-A-0

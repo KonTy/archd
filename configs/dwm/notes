@@ -44,3 +44,8 @@ EOL
 
 
 ---------------------------------------------
+
+
+
+echo "exec dwm" > ~/.xinitrc
+startx will start dwm
