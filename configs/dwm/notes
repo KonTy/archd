@@ -49,3 +49,14 @@ EOL
 
 echo "exec dwm" > ~/.xinitrc
 startx will start dwm
+
+
+Transparent windows:
+1. Install compositioning stuff
+$ pacman -S transset-df xcompmgr
+2. Run xcompmgr (and add to your .xinitrc):
+$ xcompmgr &
+3. Chose transparency (this example is 50% transparency)
+$ transset .50
+4. Click the window you want to be transparen
+
