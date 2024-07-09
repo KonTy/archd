@@ -407,10 +407,8 @@ function make_scripts_executable() {
     done
 }
 
-setup_slock_for_dwm() {
-    # Install slock if not already installed
-    sudo pacman -S --needed slock
-
+function setup_slock_for_dwm() {
+    
    # Check if ~/.xinitrc exists and does not already contain slock setup
     if [ -f ~/.xinitrc ] && ! grep -q 'slock' ~/.xinitrc; then
         # Add slock setup to ~/.xinitrc
@@ -429,8 +427,7 @@ EOF
     chmod +x ~/.xinitrc
 }
 
-
-setup_hibernation_after_idle() {
+function setup_hibernation_after_idle() {
     # Adjusting Timeout Values
     # Screen Off Timeout: You can adjust the screen off timeout by changing the delay in xset dpms force off command (e.g., xset dpms 300 for 5 minutes).
     # Hibernation Timeout: Modify OnUnitActiveSec= in the hibernate-after-idle.timer file to change the hibernation timeout.
@@ -667,4 +664,4 @@ if [[ "$ISNVIDIA" == true ]]; then
 fi
 
 echo "Starting dwm..."
-startx  
+# startx  
