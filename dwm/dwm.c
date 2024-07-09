@@ -5064,6 +5064,14 @@ updatewmhints(Client *c)
 	}
 }
 
+void setbackground(int tag) {
+    char cmd[256];
+    snprintf(cmd, sizeof(cmd), "%s/.config/configs/dwm/set_background.sh %d &", getenv("HOME"), tag);
+    system(cmd);
+}
+
+int current_tag = 0;
+
 void
 view(const Arg *arg)
 {
@@ -5099,8 +5107,19 @@ view(const Arg *arg)
 	#else
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	#endif // VIEW_HISTORY_PATCH
-	if (arg->ui & TAGMASK)
+	if (arg->ui & TAGMASK) {
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+		
+		// set background per workspace
+		if (arg->ui == ~0)
+            current_tag = 0;
+        else {
+            unsigned int i = 0;
+            while (!(arg->ui & (1 << i)))
+                i++;
+            current_tag = i;
+        }
+	}
 	#if PERTAG_PATCH
 	pertagview(arg);
 	#endif // PERTAG_PATCH
@@ -5117,6 +5136,10 @@ view(const Arg *arg)
 	#if BAR_EWMHTAGS_PATCH
 	updatecurrentdesktop();
 	#endif // BAR_EWMHTAGS_PATCH
+
+	// Call the background setting script
+	setbackground(current_tag);
+
 }
 
 Client *
