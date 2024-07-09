@@ -71,6 +71,7 @@ declare -A prep_stage=(
     [xsel]="Command-line tool to access X clipboard and selection buffers"
     [libxinerama]="X11 Xinerama extension library"
     [xorg-server]="X.Org X server"
+    [xorg-utils]="X.Org X Window System utilities"
     [xorg-xinit]="X.Org initialization program"
     [xorg-xrandr]="X.Org XRandR extension library"
     [xorg-xsetroot]="X.Org utility to set the root window properties"
