@@ -135,36 +135,7 @@ INSTLOG="install.log"
 
 ######
 
-function setup_random_border_color() {
-    # Change to dwm directory
-    cd ./dwm || { echo "Error: ./dwm directory not found."; exit 1; }
-
-
-    # Apply patches to dwm.c
-    sed -i '/#include <X11\/Xft\/Xft.h>/a #include <stdlib.h>\n#include <time.h>' dwm.c
-
-    sed -i '/int main(int argc, char \*argv\[])/a srand(time(NULL));' dwm.c
-
-    cat <<EOT >> dwm.c
-unsigned long getrandomcolor() {
-    int r = 0;
-    int g = rand() % 256;
-    int b = 0;
-
-    return (r << 16) | (g << 8) | b;
-}
-EOT
-
-    sed -i '/drawbar(Monitor \*m)/,/}/ s/XSetWindowBorder(dpy, m->sel->win, scheme\[SchemeNorm\]\[ColBorder\].pixel);/XSetWindowBorder(dpy, m->sel->win, getrandomcolor());/' dwm.c
-
-    cd -
-    # Restart dwm (optional, depending on your setup)
-    echo "dwm setup with random border color completed. Please restart your X session to apply changes."
-}
-
 function setup_dwm() {
-
-    setup_random_border_color
 
     # Change to dwm directory
     cd ./dwm || { echo "Error: ./dwm directory not found."; exit 1; }
