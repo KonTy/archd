@@ -67,7 +67,6 @@ declare -A prep_stage=(
     [rofi]="A window switcher, application launcher, and dmenu replacement for X11."
     [alacritty]="Terminal Emulator"
     [dmenu]="Dynamic Menu"
-    [Dunst]="notification service"
     [networkmanager]="Network Manager"
     [slock]="Locking app"
     [xclip]="Command-line interface to X selections"
@@ -113,6 +112,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+        [Dunst]="notification service"
     [gtk2-engines-murrine]="GTK+ theme tools for custom theme support "
     [papirus-icon-theme]="Icon theme for Linux"
     [lxappearance]="GTK+ theme switcher"
@@ -511,7 +511,7 @@ install_nvidia
 setup_dwm
 add_dwm_to_sddm
 setup_hibernation_after_idle
-setup_dunst
+# setup_dunst
 
 
 # echo -e "$CNT - Installing main components..."
