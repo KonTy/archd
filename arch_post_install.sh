@@ -76,6 +76,7 @@ declare -A prep_stage=(
     [xorg-xinit]="X.Org initialization program"
     [xorg-xrandr]="X.Org XRandR extension library"
     [xorg-xsetroot]="X.Org utility to set the root window properties"
+    [feh]="Background setter for dwm"
 )
 
 declare -A audio_stage=(
@@ -112,6 +113,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+        [picom]="Fade in out effects for background"
         [Dunst]="notification service"
     [gtk2-engines-murrine]="GTK+ theme tools for custom theme support "
     [papirus-icon-theme]="Icon theme for Linux"
@@ -147,6 +149,65 @@ function setup_dwm() {
     echo "DWM compiled and installed successfully."
 }
 
+setup_backgrounds() {
+    # Path to your background images directory
+    backgrounds_dir="$HOME/.config/configs/backgrounds"
+    
+    # Create the directory if it doesn't exist
+    mkdir -p "$backgrounds_dir"
+    
+    # Copy background images to the directory
+    cp bg*.jpg "$backgrounds_dir/"
+    
+    # Create or override set_background.sh script
+    cat > "$HOME/.config/configs/set_background.sh" <<'EOF'
+#!/bin/bash
+
+# Path to your background images directory
+BACKGROUND_DIR="$HOME/.config/configs/backgrounds"
+
+# Get the current tag (desktop) index
+tag=$(xprop -root _NET_CURRENT_DESKTOP | awk '{print $3}')
+
+# Calculate the corresponding image index (1-based)
+image_index=$((tag + 1))
+
+# Ensure image index does not exceed the number of images available
+max_images=10  # Adjust based on the number of images in your directory
+if [ "$image_index" -gt "$max_images" ]; then
+    image_index=$((image_index % max_images))
+fi
+
+# Construct the path to the background image
+background_image="$BACKGROUND_DIR/bg${image_index}.jpg"
+
+# Set background using feh (replace with your preferred tool)
+feh --bg-scale "$background_image"
+EOF
+    
+    # Make set_background.sh executable
+    chmod +x "$HOME/.config/configs/set_background.sh"
+    
+    # Check if ~/.xinitrc exists and if background setting section exists
+    if [ -f "$HOME/.xinitrc" ]; then
+        if ! grep -q "set_background.sh" "$HOME/.xinitrc"; then
+            # Append call to set_background.sh in ~/.xinitrc
+            echo >> "$HOME/.xinitrc"
+            echo "# Set background based on current desktop tag" >> "$HOME/.xinitrc"
+            echo "/bin/bash $HOME/.config/configs/set_background.sh &" >> "$HOME/.xinitrc"
+            
+            echo "Background setup completed. Please restart your X session to apply changes."
+        else
+            echo "Background setup already exists in ~/.xinitrc. No changes made."
+        fi
+    else
+        # Create ~/.xinitrc and add background setting section
+        echo "# Set background based on current desktop tag" > "$HOME/.xinitrc"
+        echo "/bin/bash $HOME/.config/configs/set_background.sh &" >> "$HOME/.xinitrc"
+        
+        echo "Background setup completed. Please restart your X session to apply changes."
+    fi
+}
 
 function add_dwm_to_sddm() {
     # Check if dwm.desktop file already exists
@@ -509,6 +570,7 @@ install_software audio_stage
 install_nvidia
 
 setup_dwm
+setup_backgrounds
 add_dwm_to_sddm
 setup_hibernation_after_idle
 # setup_dunst
