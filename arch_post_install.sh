@@ -149,7 +149,7 @@ function setup_dwm() {
     echo "DWM compiled and installed successfully."
 }
 
-setup_backgrounds() {
+function setup_backgrounds() {
     # Path to your background images directory
     backgrounds_dir="$HOME/.config/configs/backgrounds"
     
@@ -649,7 +649,7 @@ echo -e "$CNT - Enabling the SDDM Service..."
 sudo systemctl enable sddm &>> $INSTLOG
 sleep 2
 
-exec sudo systemctl start sddm &>> $INSTLOG
+#exec sudo systemctl start sddm &>> $INSTLOG
 
 sudo usermod -a -G audio $USER
 
