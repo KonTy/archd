@@ -1,0 +1,8 @@
+# ~/.config/alacritty/alacritty.yml
+
+# Font configuration
+font:
+  normal:
+    family: Hack
+    style: Regular
+    size: 14.0  # Adjust the font size as needed

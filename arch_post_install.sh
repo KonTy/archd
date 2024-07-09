@@ -247,10 +247,7 @@ EOF
             echo "~/.xinitrc already contains exec dwm."
         fi
     fi
-
-    # Restart SDDM
-    sudo systemctl restart sddm
-
+    
     echo "dwm has been added as an option to SDDM."
     echo "You can now select dwm from the session list on the SDDM login screen."
 }
@@ -598,6 +595,8 @@ ln -sf ~/.config/configs/wlogout/layout ~/.config/wlogout/layout
 
 ln -sf ~/.config/configs/rofi/config.rasi ~/.config/rofi/config.rasi
 ln -sf ~/.config/configs/rofi/theme.rasi ~/.config/rofi/theme.rasi
+
+ln -sf ~/.config/configs/alacritty/alacritty.yml ~/.config/alacritty/alacritty.yml
 
 sudo cp -f -u ~/.config/configs/mc/ini ~/.config/mc/ini 
 sudo cp -f -u ~/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
