@@ -172,6 +172,25 @@ function setup_dwm() {
     # Compile dwm
     sudo make clean install || { echo "Error: Compilation failed."; exit 1; }
 
+    # Get current time in seconds since Epoch
+    current_time=$(date +%s)
+
+    # Get modification time of dwm binary
+    echo "Checking dwm in here  /usr/local/bin/dwm"
+    dwm_modification_time=$(stat -c %Y /usr/local/bin/dwm)
+
+    # Calculate the difference in seconds
+    time_diff=$((current_time - dwm_modification_time))
+
+    # Check if dwm was compiled in the last 3 minutes (180 seconds)
+    if [ $time_diff -le 180 ]; then
+        echo "dwm was compiled within the last 3 minutes."
+    else
+        echo "dwm was not compiled recently."
+    fi
+
+    # sudo systemctl restart display-manager
+
     # Change back to original directory
     cd - >/dev/null || exit
 
@@ -576,8 +595,10 @@ install_nvidia
 
 setup_dwm
 setup_backgrounds
+setup_slock_for_dwm
 add_dwm_to_sddm
 setup_hibernation_after_idle
+setup_picom
 # setup_dunst
 
 
