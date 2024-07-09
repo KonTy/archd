@@ -75,7 +75,7 @@ declare -A prep_stage=(
     [xorg-xrandr]="X.Org XRandR extension library"
     [xorg-xsetroot]="X.Org utility to set the root window properties"
     [feh]="Background setter for dwm"
-    [picom-animations-git]="Windows effects and animations, fork of picom with animations"
+    [picom-ibhagwan-git]="Windows effects and animations, fork of picom with animations"
 )
 
 declare -A audio_stage=(
