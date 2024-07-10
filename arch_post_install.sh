@@ -176,22 +176,22 @@ function setup_backgrounds() {
     # Make set-background.sh executable
     chmod +x "$HOME/.config/configs/dwm/set-background.sh"
     
-    # Check if ~/.xinitrc exists and if background setting section exists
-    if [ -f "$HOME/.xinitrc" ]; then
-        if ! grep -q "set-background.sh" "$HOME/.xinitrc"; then
-            # Append call to set-background.sh in ~/.xinitrc
-            echo >> "$HOME/.xinitrc"
-            echo "# Set background based on current desktop tag" >> "$HOME/.xinitrc"
-            echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xinitrc"
+    # Check if ~/.xprofile exists and if background setting section exists
+    if [ -f "$HOME/.xprofile" ]; then
+        if ! grep -q "set-background.sh" "$HOME/.xprofile"; then
+            # Append call to set-background.sh in ~/.xprofile
+            echo >> "$HOME/.xprofile"
+            echo "# Set background based on current desktop tag" >> "$HOME/.xprofile"
+            echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xprofile"
             
             echo "Background setup completed. Please restart your X session to apply changes."
         else
-            echo "Background setup already exists in ~/.xinitrc. No changes made."
+            echo "Background setup already exists in ~/.xprofile. No changes made."
         fi
     else
-        # Create ~/.xinitrc and add background setting section
-        echo "# Set background based on current desktop tag" > "$HOME/.xinitrc"
-        echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xinitrc"
+        # Create ~/.xprofile and add background setting section
+        echo "# Set background based on current desktop tag" > "$HOME/.xprofile"
+        echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xprofile"
         
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
@@ -221,20 +221,20 @@ EOF'
         return 1
     fi
 
-    # Create ~/.xinitrc file with dwm if it does not exist
-    if [ ! -f ~/.xinitrc ]; then
-        cat > ~/.xinitrc << EOF
+    # Create ~/.xprofile file with dwm if it does not exist
+    if [ ! -f ~/.xprofile ]; then
+        cat > ~/.xprofile << EOF
 #!/bin/sh
 exec dwm
 EOF
-        chmod +x ~/.xinitrc
-        echo "Created ~/.xinitrc with exec dwm."
+        chmod +x ~/.xprofile
+        echo "Created ~/.xprofile with exec dwm."
     else
-        if ! grep -q "exec dwm" ~/.xinitrc; then
-            echo "exec dwm" >> ~/.xinitrc
-            echo "Appended exec dwm to ~/.xinitrc."
+        if ! grep -q "exec dwm" ~/.xprofile; then
+            echo "exec dwm" >> ~/.xprofile
+            echo "Appended exec dwm to ~/.xprofile."
         else
-            echo "~/.xinitrc already contains exec dwm."
+            echo "~/.xprofile already contains exec dwm."
         fi
     fi
     
@@ -394,22 +394,22 @@ function make_scripts_executable() {
 
 function setup_slock_for_dwm() {
     
-   # Check if ~/.xinitrc exists and does not already contain slock setup
-    if [ -f ~/.xinitrc ] && ! grep -q 'slock' ~/.xinitrc; then
-        # Add slock setup to ~/.xinitrc
-        cat >> ~/.xinitrc <<'EOF'
+   # Check if ~/.xprofile exists and does not already contain slock setup
+    if [ -f ~/.xprofile ] && ! grep -q 'slock' ~/.xprofile; then
+        # Add slock setup to ~/.xprofile
+        cat >> ~/.xprofile <<'EOF'
 
 # Start slock to handle screen locking
 slock &
 
 EOF
-        echo "slock setup added to ~/.xinitrc."
+        echo "slock setup added to ~/.xprofile."
     else
-        echo "slock setup already exists in ~/.xinitrc or ~/.xinitrc does not exist."
+        echo "slock setup already exists in ~/.xprofile or ~/.xprofile does not exist."
     fi
 
-    # Make ~/.xinitrc executable
-    chmod +x ~/.xinitrc
+    # Make ~/.xprofile executable
+    chmod +x ~/.xprofile
 }
 
 function setup_hibernation_after_idle() {
@@ -510,23 +510,23 @@ function install_yay() {
 }
 
 function setup_dunst() {
-    # Check if ~/.xinitrc exists and does not already contain dunst setup
-    if [ -f ~/.xinitrc ] && ! grep -q 'dunst &' ~/.xinitrc; then
-        # Add dunst setup to ~/.xinitrc
-        cat >> ~/.xinitrc <<'EOF'
+    # Check if ~/.xprofile exists and does not already contain dunst setup
+    if [ -f ~/.xprofile ] && ! grep -q 'dunst &' ~/.xprofile; then
+        # Add dunst setup to ~/.xprofile
+        cat >> ~/.xprofile <<'EOF'
 # Start Dunst for notifications
 dunst &
 EOF
-        echo "Dunst setup added to ~/.xinitrc."
+        echo "Dunst setup added to ~/.xprofile."
     else
-        echo "Dunst setup already exists in ~/.xinitrc or ~/.xinitrc does not exist."
+        echo "Dunst setup already exists in ~/.xprofile or ~/.xprofile does not exist."
     fi
 
     ln -sf ~/.config/configs/dunst/dunstrc ~/.config/dunst/dunstrc
 }
 
 function setup_picom() {
-    # Add picom startup command to ~/.xinitrc if not already present
+    # Add picom startup command to ~/.xprofile if not already present
     # Source and destination paths
     src_file=~/.config/configs/picom/picom.conf
     dest_file=~/.config/picom.conf
@@ -540,14 +540,14 @@ function setup_picom() {
     # Create the symbolic link
     ln -sf "$src_file" "$dest_file"
 
-    if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xinitrc; then
-        echo >> ~/.xinitrc
-        echo "# Start picom" >> ~/.xinitrc
-        echo "picom --config ~/.config/picom.conf &" >> ~/.xinitrc
+    if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xprofile; then
+        echo >> ~/.xprofile
+        echo "# Start picom" >> ~/.xprofile
+        echo "picom --config ~/.config/picom.conf &" >> ~/.xprofile
         # --experimental-backends 
-        echo "Added picom startup command to ~/.xinitrc"
+        echo "Added picom startup command to ~/.xprofile"
     else
-        echo "Picom startup command already exists in ~/.xinitrc"
+        echo "Picom startup command already exists in ~/.xprofile"
     fi
 
     echo "Transparency setup completed. Please restart your X session to apply changes."
