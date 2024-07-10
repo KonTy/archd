@@ -527,10 +527,11 @@ EOF
 
 function setup_picom() {
     # Add picom startup command to ~/.xinitrc if not already present
-    if ! grep -q "picom --experimental-backends --config ~/.config/picom.conf &" ~/.xinitrc; then
+    if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xinitrc; then
         echo >> ~/.xinitrc
         echo "# Start picom" >> ~/.xinitrc
-        echo "picom --experimental-backends --config ~/.config/picom.conf &" >> ~/.xinitrc
+        echo "picom --config ~/.config/picom.conf &" >> ~/.xinitrc
+        # --experimental-backends 
         echo "Added picom startup command to ~/.xinitrc"
     else
         echo "Picom startup command already exists in ~/.xinitrc"
@@ -593,10 +594,7 @@ cp -R -u configs ~/.config/
 # Config files 
 # ********************************************************************
 echo -e "$CNT - Setting up the new config..." 
-cp -R -u -f ~/.config/configs/hypr/* ~/.config/hypr/
 ln -sf ~/.config/configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
-ln -sf ~/.config/configs/mako/conf/config ~/.config/mako/config
-
 ln -sf ~/.config/configs/wlogout/layout ~/.config/wlogout/layout
 
 ln -sf ~/.config/configs/rofi/config.rasi ~/.config/rofi/config.rasi
