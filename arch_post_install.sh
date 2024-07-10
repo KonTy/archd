@@ -569,7 +569,6 @@ install_nvidia
 setup_dwm
 setup_backgrounds
 setup_slock_for_dwm
-add_dwm_to_sddm
 setup_hibernation_after_idle
 setup_picom
 # setup_dunst
@@ -672,5 +671,6 @@ if [[ "$ISNVIDIA" == true ]]; then
 fi
 
 echo "Starting dwm..."
+add_dwm_to_sddm
 # pkill dwm
 # startx  
