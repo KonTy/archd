@@ -173,16 +173,16 @@ function setup_backgrounds() {
     # Path to your background images directory
     backgrounds_dir="$HOME/.config/configs/backgrounds"
     
-    # Make set_background.sh executable
-    chmod +x "$HOME/.config/configs/dwm/set_background.sh"
+    # Make set-background.sh executable
+    chmod +x "$HOME/.config/configs/dwm/set-background.sh"
     
     # Check if ~/.xinitrc exists and if background setting section exists
     if [ -f "$HOME/.xinitrc" ]; then
-        if ! grep -q "set_background.sh" "$HOME/.xinitrc"; then
-            # Append call to set_background.sh in ~/.xinitrc
+        if ! grep -q "set-background.sh" "$HOME/.xinitrc"; then
+            # Append call to set-background.sh in ~/.xinitrc
             echo >> "$HOME/.xinitrc"
             echo "# Set background based on current desktop tag" >> "$HOME/.xinitrc"
-            echo "/bin/bash $HOME/.config/configs/dwm/set_background.sh 1 &" >> "$HOME/.xinitrc"
+            echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xinitrc"
             
             echo "Background setup completed. Please restart your X session to apply changes."
         else
@@ -191,7 +191,7 @@ function setup_backgrounds() {
     else
         # Create ~/.xinitrc and add background setting section
         echo "# Set background based on current desktop tag" > "$HOME/.xinitrc"
-        echo "/bin/bash $HOME/.config/configs/dwm/set_background.sh 1 &" >> "$HOME/.xinitrc"
+        echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xinitrc"
         
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
