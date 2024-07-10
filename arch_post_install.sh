@@ -527,6 +527,19 @@ EOF
 
 function setup_picom() {
     # Add picom startup command to ~/.xinitrc if not already present
+    # Source and destination paths
+    src_file=~/.config/configs/picom/picom.conf
+    dest_file=~/.config/picom.conf
+
+    # Check if the destination file already exists
+    if [ -f "$dest_file" ]; then
+        # Remove the existing file before creating the symbolic link
+        rm -f "$dest_file"
+    fi
+
+    # Create the symbolic link
+    ln -sf "$src_file" "$dest_file
+
     if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xinitrc; then
         echo >> ~/.xinitrc
         echo "# Start picom" >> ~/.xinitrc
@@ -536,7 +549,7 @@ function setup_picom() {
     else
         echo "Picom startup command already exists in ~/.xinitrc"
     fi
-    ln -sf ~/.config/configs/picom/picom.cong ~/.config/picom.conf
+
     echo "Transparency setup completed. Please restart your X session to apply changes."
 }
 
