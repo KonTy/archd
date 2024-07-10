@@ -538,7 +538,7 @@ function setup_picom() {
     fi
 
     # Create the symbolic link
-    ln -sf "$src_file" "$dest_file
+    ln -sf "$src_file" "$dest_file"
 
     if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xinitrc; then
         echo >> ~/.xinitrc
