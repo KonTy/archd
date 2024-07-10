@@ -55,6 +55,7 @@ ISNVIDIA=false
 declare -A prep_stage=(
     [base-devel]="Base development tools"
     [git]="Version control system"
+    [libxext]="This library is for window effects for DWM"
     [ttf-jetbrains-mono-nerd]="JetBrains Mono Nerd Font"
     [ttf-font-awesome]="Font awesome"
     [ttf-dejavu]="Dejavu fonts"
