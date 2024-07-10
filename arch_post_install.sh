@@ -594,12 +594,19 @@ cp -R -u configs ~/.config/
 # Config files 
 # ********************************************************************
 echo -e "$CNT - Setting up the new config..." 
+
+# Ensure destination directories exist
+mkdir -p ~/.config/kitty
 ln -sf ~/.config/configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
+
+mkdir -p ~/.config/wlogout
 ln -sf ~/.config/configs/wlogout/layout ~/.config/wlogout/layout
 
+mkdir -p ~/.config/rofi
 ln -sf ~/.config/configs/rofi/config.rasi ~/.config/rofi/config.rasi
 ln -sf ~/.config/configs/rofi/theme.rasi ~/.config/rofi/theme.rasi
 
+mkdir -p ~/.config/alacritty
 ln -sf ~/.config/configs/alacritty/alacritty.yml ~/.config/alacritty/alacritty.yml
 
 sudo cp -f -u ~/.config/configs/mc/ini ~/.config/mc/ini 
