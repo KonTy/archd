@@ -57,6 +57,7 @@ declare -A prep_stage=(
     [base-devel]="Base development tools"
     [git]="Version control system"
     [libxext]="This library is for window effects for DWM"
+    [libxrandr]="Provides an X Window System extension for dynamic resizing and rotation of X screen"
     [ttf-jetbrains-mono-nerd]="JetBrains Mono Nerd Font"
     [ttf-font-awesome]="Font awesome"
     [ttf-dejavu]="Dejavu fonts"
@@ -144,21 +145,21 @@ function compile_app() {
 
     if [ -z "$app_name" ]; then
         echo -e "${RED}[ERROR] No application name provided.${NC}"
-        return 1
+        exit 1
     fi
 
     # Change to the application directory
-    cd ./"$app_name" || { echo -e "${RED}[ERROR] ./$app_name directory not found.${NC}"; return 1; }
+    cd ./"$app_name" || { echo -e "${RED}[ERROR] ./$app_name directory not found.${NC}"; exit 1; }
 
     # Compile the application
-    sudo make clean install || { echo -e "${RED}[ERROR] Compilation failed.${NC}"; return 1; }
+    sudo make clean install || { echo -e "${RED}[ERROR] Compilation failed.${NC}"; exit 1; }
 
     # Get current time in seconds since Epoch
     current_time=$(date +%s)
 
     # Get modification time of the application binary
     echo "Checking $app_name in /usr/local/bin/$app_name"
-    app_modification_time=$(stat -c %Y /usr/local/bin/"$app_name") || { echo -e "${RED}[ERROR] Could not get modification time.${NC}"; return 1; }
+    app_modification_time=$(stat -c %Y /usr/local/bin/"$app_name") || { echo -e "${RED}[ERROR] Could not get modification time.${NC}"; exit 1; }
 
     # Calculate the difference in seconds
     time_diff=$((current_time - app_modification_time))

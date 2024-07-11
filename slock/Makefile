@@ -13,6 +13,7 @@ all: slock
 
 ${OBJ}: config.h config.mk arg.h util.h
 
+.PHONY: config.h
 config.h:
 	cp config.def.h $@
 

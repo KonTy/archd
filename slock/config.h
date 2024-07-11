@@ -11,8 +11,7 @@ static const char *colorname[NUMCOLS] = {
 
 /* treat a cleared input like a wrong password (color) */
 static const int failonclear = 1;
-static const int squaresize = 15;
-static const int timetocancel = 4;
+static const int squaresize = 50;
 static const int monitortime = 5;
 static const int runonce = 0;
 /* length of time (seconds) until [command] is executed */
