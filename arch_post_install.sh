@@ -79,9 +79,10 @@ declare -A prep_stage=(
     [picom-ftlabs-git]="Windows effects and animations, fork of picom with animations"
     [networkmanager]="Network Manager"
     [dunst]="Lightweight notification service"
-    [calcurse-git]="CLI calendar"
+    [libnotify]="command-line utility on Linux systems used to send desktop notifications"
 )
 
+#     [calcurse-git]="CLI calendar"
 #     [dmenu]="Dynamic Menu"
 
 declare -A audio_stage=(
