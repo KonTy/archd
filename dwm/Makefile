@@ -19,6 +19,7 @@ endif
 
 ${OBJ}: config.h config.mk patches.h
 
+.PHONY: config.h
 config.h:
 	cp config.def.h $@
 

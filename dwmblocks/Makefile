@@ -19,6 +19,7 @@ options:
 dwmblocks: dwmblocks.c blocks.def.h blocks.h
 	${CC} -o dwmblocks dwmblocks.c ${CFLAGS} ${LDFLAGS}
 
+.PHONY: blocks.h
 blocks.h:
 	cp blocks.def.h $@
 
