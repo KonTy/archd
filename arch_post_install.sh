@@ -669,11 +669,7 @@ echo -e "$CNT - Copying config files..."
 sudo cp -R -f configs "$HOME/.config/"
 
 echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
-# sudo cp -R -f configs/scripts/* "$HOME/.local/bin"
 sudo cp -R -f configs/scripts/* /usr/local/bin/
-
-
-
 
 # ********************************************************************
 # Config files 
@@ -681,19 +677,18 @@ sudo cp -R -f configs/scripts/* /usr/local/bin/
 echo -e "$CNT - Setting up the new config..." 
 
 # Ensure destination directories exist
-mkdir -p $HOME/.config/kitty
-ln -sf $HOME/.config/configs/kitty/kitty.conf $HOME/.config/kitty/kitty.conf
+# mkdir -p $HOME/.config/kitty
+# ln -sf $HOME/.config/configs/kitty/kitty.conf $HOME/.config/kitty/kitty.conf
 
-mkdir -p $HOME/.config/rofi
-ln -sf $HOME/.config/configs/rofi/config.rasi $HOME/.config/rofi/config.rasi
-ln -sf $HOME/.config/configs/rofi/theme.rasi $HOME/.config/rofi/theme.rasi
+# mkdir -p $HOME/.config/rofi
+# ln -sf $HOME/.config/configs/rofi/config.rasi $HOME/.config/rofi/config.rasi
+# ln -sf $HOME/.config/configs/rofi/theme.rasi $HOME/.config/rofi/theme.rasi
 
 mkdir -p $HOME/.config/alacritty
 ln -sf $HOME/.config/configs/alacritty/alacritty.yml $HOME/.config/alacritty/alacritty.yml
 
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
-
 
 compile_app slock
 compile_app dwm
