@@ -23,6 +23,7 @@ ${OBJ}: config.h config.mk patches.h
 config.h:
 	cp config.def.h $@
 
+.PHONY: patches.h
 patches.h:
 	cp patches.def.h $@
 

@@ -625,6 +625,8 @@ EOF
 # clear the screen
 clear
 
+export PATH="$HOME/.local/bin:$PATH"
+
 echo -e "$CNT - Setup starting..."
 is_vm
 install_yay
