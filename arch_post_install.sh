@@ -15,6 +15,7 @@ cd "$(dirname "$0")"
 
 
 # TODO: how to make brave dark?
+# Install https://framagit.org/Daguhh/naivecalendar
 # How to lock system with win+L
 # how to control volume and brigtness
 #how to show wifi and bluetooth and airplane mode
@@ -65,9 +66,7 @@ declare -A prep_stage=(
     [sddm]="Display Manager"
     [rofi]="A window switcher, application launcher, and dmenu replacement for X11."
     [alacritty]="Terminal Emulator"
-    [dmenu]="Dynamic Menu"
-    [networkmanager]="Network Manager"
-    [slock]="Locking app"
+    [xautolock]="Autolocking app"
     [xclip]="Command-line interface to X selections"
     [xsel]="Command-line tool to access X clipboard and selection buffers"
     [libxinerama]="X11 Xinerama extension library"
@@ -77,6 +76,8 @@ declare -A prep_stage=(
     [xorg-xsetroot]="X.Org utility to set the root window properties"
     [feh]="Background setter for dwm"
     [picom-ftlabs-git]="Windows effects and animations, fork of picom with animations"
+    [dmenu]="Dynamic Menu"
+    [networkmanager]="Network Manager"
 )
 
 declare -A audio_stage=(
@@ -136,45 +137,51 @@ INSTLOG="install.log"
 
 ######
 
-function setup_dwm() {
+function compile_app() {
+    app_name=$1
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
 
-    # Change to dwm directory
-    cd ./dwm || { echo "Error: ./dwm directory not found."; exit 1; }
+    if [ -z "$app_name" ]; then
+        echo -e "${RED}[ERROR] No application name provided.${NC}"
+        return 1
+    fi
 
-    # Compile dwm
-    sudo make clean install || { echo "Error: Compilation failed."; exit 1; }
+    # Change to the application directory
+    cd ./"$app_name" || { echo -e "${RED}[ERROR] ./$app_name directory not found.${NC}"; return 1; }
+
+    # Compile the application
+    sudo make clean install || { echo -e "${RED}[ERROR] Compilation failed.${NC}"; return 1; }
 
     # Get current time in seconds since Epoch
     current_time=$(date +%s)
 
-    # Get modification time of dwm binary
-    echo "Checking dwm in here  /usr/local/bin/dwm"
-    dwm_modification_time=$(stat -c %Y /usr/local/bin/dwm)
+    # Get modification time of the application binary
+    echo "Checking $app_name in /usr/local/bin/$app_name"
+    app_modification_time=$(stat -c %Y /usr/local/bin/"$app_name") || { echo -e "${RED}[ERROR] Could not get modification time.${NC}"; return 1; }
 
     # Calculate the difference in seconds
-    time_diff=$((current_time - dwm_modification_time))
+    time_diff=$((current_time - app_modification_time))
 
-    # Check if dwm was compiled in the last 3 minutes (180 seconds)
+    # Check if the application was compiled in the last 3 minutes (180 seconds)
     if [ $time_diff -le 180 ]; then
-        echo "dwm was compiled within the last 3 minutes."
+        echo "$app_name was compiled within the last 3 minutes."
     else
-        echo "dwm was not compiled recently."
+        echo "$app_name was not compiled recently."
     fi
 
+    # Optionally restart the display manager (commented out)
     # sudo systemctl restart display-manager
 
-    # Change back to original directory
+    # Change back to the original directory
     cd - >/dev/null || exit
 
-    echo "DWM compiled and installed successfully."
+    echo "$app_name compiled and installed successfully."
 }
 
 function setup_backgrounds() {
     # Path to your background images directory
     backgrounds_dir="$HOME/.config/configs/backgrounds"
-    
-    # Make set-background.sh executable
-    chmod +x "$HOME/.config/configs/dwm/set-background.sh"
     
     # Check if ~/.xprofile exists and if background setting section exists
     if [ -f "$HOME/.xprofile" ]; then
@@ -182,7 +189,7 @@ function setup_backgrounds() {
             # Append call to set-background.sh in ~/.xprofile
             echo >> "$HOME/.xprofile"
             echo "# Set background based on current desktop tag" >> "$HOME/.xprofile"
-            echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xprofile"
+            echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
             
             echo "Background setup completed. Please restart your X session to apply changes."
         else
@@ -191,7 +198,7 @@ function setup_backgrounds() {
     else
         # Create ~/.xprofile and add background setting section
         echo "# Set background based on current desktop tag" > "$HOME/.xprofile"
-        echo "/bin/bash $HOME/.config/configs/dwm/set-background.sh 1 &" >> "$HOME/.xprofile"
+        echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
         
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
@@ -399,8 +406,8 @@ function setup_slock_for_dwm() {
         # Add slock setup to ~/.xprofile
         cat >> ~/.xprofile <<'EOF'
 
-# Start slock to handle screen locking
-slock &
+# Start xautolock to automatically lock the screen after 10 minutes of inactivity
+xautolock -time 10 -locker slock &
 
 EOF
         echo "slock setup added to ~/.xprofile."
@@ -566,6 +573,51 @@ function is_vm() {
     fi
 }
 
+
+function setup_video_hibernation() {
+    # Step 1: Create the monitor script
+    sudo tee /usr/local/bin/monitor_video.sh > /dev/null << 'EOF'
+#!/bin/bash
+
+while true; do
+    if pgrep -x "mpv" || pgrep -x "vlc"; then
+        echo "Video playing, preventing hibernation"
+        systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+    else
+        echo "No video playing, hibernation allowed"
+        systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+    fi
+
+    sleep 60  # Check every minute
+done
+EOF
+
+    # Step 2: Set permissions for the monitor script
+    sudo chmod +x /usr/local/bin/monitor_video.sh
+
+    # Step 3: Create the systemd service
+    sudo tee /etc/systemd/system/monitor_video.service > /dev/null << 'EOF'
+[Unit]
+Description=Monitor video playback for hibernation prevention
+
+[Service]
+ExecStart=/usr/local/bin/monitor_video.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Step 4: Reload systemd configuration
+    sudo systemctl daemon-reload
+
+    # Step 5: Enable and start the systemd service
+    sudo systemctl enable monitor_video.service
+    sudo systemctl start monitor_video.service
+
+    echo "Video playback monitoring and hibernation setup complete."
+}
+
+
 # clear the screen
 clear
 
@@ -579,11 +631,26 @@ echo -e "$CNT - Audio Stage - Installing audio components"
 install_software audio_stage
 install_nvidia
 
-setup_dwm
+# this is for debugging only, remove this logic later
+if [ -f "~/.xprofile" ]; then
+    # Delete the file
+    rm -f "~/.xprofile"
+    echo "File $FILE has been deleted."
+else
+    echo "File $FILE does not exist."
+fi
+
+compile_app slock
+compile_app dwm
+compile_app dwmblocks
+
+make_scripts_executable "~/.config/configs/scripts"
+
 setup_backgrounds
 setup_slock_for_dwm
 setup_hibernation_after_idle
 setup_picom
+setup_video_hibernation
 # setup_dunst
 
 
