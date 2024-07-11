@@ -644,20 +644,9 @@ else
     echo "$HOME/.xprofile does not existn no need to delete it"
 fi
 
-compile_app slock
-compile_app dwm
-compile_app dwmblocks
 
-make_scripts_executable "$HOME/.config/configs/scripts"
-
-setup_backgrounds
-setup_slock_for_dwm
-setup_hibernation_after_idle
-setup_picom
-setup_video_hibernation
+# TODO: 
 # setup_dunst
-
-
 # echo -e "$CNT - Installing main components..."
 # install_software install_stage
 
@@ -672,7 +661,14 @@ setup_video_hibernation
 
 echo -e "$CNT - Copying config files..."
 # copy the configs directory
-cp -R -u configs $HOME/.config/
+cp -R -u configs "$HOME/.config/"
+
+echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
+cp -R -u configs/scripts "$HOME/.local/bin"
+
+make_scripts_executable "$HOME/.config/configs/scripts"
+make_scripts_executable "$HOME/.local/bin"
+
 # ********************************************************************
 # Config files 
 # ********************************************************************
@@ -693,10 +689,20 @@ sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
 
+compile_app slock
+compile_app dwm
+compile_app dwmblocks
+setup_backgrounds
+setup_slock_for_dwm
+setup_hibernation_after_idle
+setup_picom
+setup_video_hibernation
+
+
 # ********************************************************************
 # setup the first look and feel as dark
 # ********************************************************************
-
+# TODO:
 # mkdir -p $HOME/.themes
 # cp -r -f -d -u $HOME/.config/configs/gtktheme/Arc-BLACKEST $HOME/.themes/
 # xfconf-query -c xsettings -p /Net/ThemeName -s "BWnB-GTK"
