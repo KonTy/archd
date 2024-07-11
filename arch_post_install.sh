@@ -143,6 +143,8 @@ function compile_app() {
     RED='\033[0;31m'
     NC='\033[0m' # No Color
 
+    echo -e "Compiling ${app_name}..."
+
     if [ -z "$app_name" ]; then
         echo -e "${RED}[ERROR] No application name provided.${NC}"
         exit 1
