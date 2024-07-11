@@ -636,9 +636,9 @@ install_nvidia
 if [ -f "~/.xprofile" ]; then
     # Delete the file
     rm -f "~/.xprofile"
-    echo "File $FILE has been deleted."
+    echo "~/.xprofile has been deleted."
 else
-    echo "File $FILE does not exist."
+    echo "~/.xprofile does not existn no need to delete it"
 fi
 
 compile_app slock
