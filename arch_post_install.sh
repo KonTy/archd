@@ -666,11 +666,11 @@ echo -e "$CNT - Copying config files..."
 sudo cp -R -f configs "$HOME/.config/"
 
 echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
-sudo cp -R -f configs/scripts "$HOME/.local/bin"
-sudo cp -R -f configs/scripts "/usr/local/bin"
+sudo cp -R -f configs/scripts/* "$HOME/.local/bin"
+# sudo cp -R -f configs/scripts/& "/usr/local/bin"
 
 make_scripts_executable "$HOME/.config/configs/scripts"
-make_scripts_executable "/usr/local/bin"
+make_scripts_executable "$HOME/.local/bin"
 
 # ********************************************************************
 # Config files 
