@@ -77,9 +77,11 @@ declare -A prep_stage=(
     [xorg-xsetroot]="X.Org utility to set the root window properties"
     [feh]="Background setter for dwm"
     [picom-ftlabs-git]="Windows effects and animations, fork of picom with animations"
-    [dmenu]="Dynamic Menu"
     [networkmanager]="Network Manager"
+    [dunst]="Lightweight notification service"
 )
+
+#     [dmenu]="Dynamic Menu"
 
 declare -A audio_stage=(
     [pipewire]="Multimedia server"
