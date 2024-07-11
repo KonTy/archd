@@ -1,10 +1,38 @@
 #!/bin/sh
 
-date '+%a, %b %d %H:%M '
+date '+%H:%M'
+
 
 case $BLOCK_BUTTON in
-	1) pgrep -x dunst >/dev/null && notify-send "This Month" "$(cal --color=always | sed "s/..7m/<b><span color=\"red\">/;s/..27m/<\/span><\/b>/")" && notify-send "Appointments" "$(calcurse -d3)" ;;
-	2) $TERMINAL -e calcurse -D ~/.config/calcurse ;;
-	3) pgrep -x dunst >/dev/null && notify-send "📅 Time/date module" "\- Left click to show upcoming appointments for the next three days via \`calcurse -d3\` and show the month via \`cal\`
-- Middle click opens calcurse if installed" ;;
+    1)
+        $TERMINAL -e sh -c 'echo "Left Button Clicked"; read -p "Press Enter to close..."'
+        ;;
+    2)
+        pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Middle Button"  # Debug message for the click event
+        && $TERMINAL -e sh -c 'echo "Middle Button Clicked"; read -p "Press Enter to close..."'
+        ;;
+    3)
+        pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Right Button"  # Debug message for the click event
+        && notify-send "📅 Time/date module" "\
+        - Left click to show upcoming appointments for the next three days via \`calcurse -d3\` and show the month via \`cal\`
+        - Middle click opens calcurse if installed"
+        ;;
 esac
+
+# case $BLOCK_BUTTON in
+#     1)
+#         pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on This Month"  # Debug message for the click event
+#         && notify-send "This Month" "$(cal --color=always | sed "s/..7m/<b><span color=\"red\">/;s/..27m/<\/span><\/b>/")"
+#         && notify-send "Appointments" "$(calcurse -d3)"
+#         ;;
+#     2)
+#         pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Middle Button"  # Debug message for the click event
+#         && $TERMINAL -e sh -c 'echo "Middle Button Clicked"; calcurse -D ~/.config/calcurse'
+#         ;;
+#     3)
+#         pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Right Button"  # Debug message for the click event
+#         && notify-send "📅 Time/date module" "\
+#         - Left click to show upcoming appointments for the next three days via \`calcurse -d3\` and show the month via \`cal\`
+#         - Middle click opens calcurse if installed"
+#         ;;
+# esac
