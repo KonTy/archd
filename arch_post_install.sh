@@ -650,8 +650,22 @@ function link_all_scripts() {
     echo "$CNT - Linking completed."
 }
 
+# Function to ask for sudo password once
+ask_for_sudo() {
+    # Prompt for sudo password once
+    sudo -v
+    # Keep sudo credentials alive in the background
+    while true; do
+        sudo -n true
+        sleep 60
+        kill -0 "$$" || exit
+    done &> /dev/null &
+}
+
 # clear the screen
 clear
+
+ask_for_sudo
 
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -711,7 +725,7 @@ echo -e "$CNT - Setting up the new config..."
 
 
 echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
-link_all_scripts "$HOME/.config/configs/script" "/usr/local/bin"
+link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
 # sudo cp -R -f configs/scripts/* /usr/local/bin/
 
 echo -e "$CNT - Alacritty config..."
