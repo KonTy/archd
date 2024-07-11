@@ -188,11 +188,11 @@ function setup_backgrounds() {
     
     # Check if $HOME/.xprofile exists and if background setting section exists
     if [ -f "$HOME/.xprofile" ]; then
-        if ! grep -q "set-background.sh" "$HOME/.xprofile"; then
-            # Append call to set-background.sh in $HOME/.xprofile
+        if ! grep -q "set-background" "$HOME/.xprofile"; then
+            # Append call to set-background in $HOME/.xprofile
             echo >> "$HOME/.xprofile"
             echo "# Set background based on current desktop tag" >> "$HOME/.xprofile"
-            echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
+            echo "/bin/bash set-background 1 &" >> "$HOME/.xprofile"
             
             echo "Background setup completed. Please restart your X session to apply changes."
         else
@@ -201,7 +201,7 @@ function setup_backgrounds() {
     else
         # Create $HOME/.xprofile and add background setting section
         echo "# Set background based on current desktop tag" > "$HOME/.xprofile"
-        echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
+        echo "/bin/bash set-background 1 &" >> "$HOME/.xprofile"
         
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
@@ -621,6 +621,34 @@ EOF
     echo "Video playback monitoring and hibernation setup complete."
 }
 
+# Function definition
+function link_all_scripts() {
+    local source_dir="$1"
+    local target_dir="$2"
+
+    # Check if source_dir exists and is a directory
+    if [ ! -d "$source_dir" ]; then
+        echo "Error: Source directory '$source_dir' does not exist."
+        return 1
+    fi
+
+    # Check if target_dir exists and is a directory
+    if [ ! -d "$target_dir" ]; then
+        echo "Error: Target directory '$target_dir' does not exist."
+        return 1
+    fi
+
+    # Loop through all files in source_dir and create symlinks in target_dir
+    for file in "$source_dir"/*; do
+        if [ -f "$file" ]; then
+            local file_name=$(basename "$file")
+            ln -sf "$file" "$target_dir/$file_name"
+            echo "Linked '$file_name' to '$target_dir'"
+        fi
+    done
+
+    echo "Linking completed."
+}
 
 # clear the screen
 clear
@@ -668,9 +696,6 @@ echo -e "$CNT - Copying config files..."
 # copy the configs directory
 sudo cp -R -f configs "$HOME/.config/"
 
-echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
-sudo cp -R -f configs/scripts/* /usr/local/bin/
-
 # ********************************************************************
 # Config files 
 # ********************************************************************
@@ -684,9 +709,16 @@ echo -e "$CNT - Setting up the new config..."
 # ln -sf $HOME/.config/configs/rofi/config.rasi $HOME/.config/rofi/config.rasi
 # ln -sf $HOME/.config/configs/rofi/theme.rasi $HOME/.config/rofi/theme.rasi
 
+
+echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
+link_all_scripts "$HOME/.config/configs/script" "/usr/local/bin"
+# sudo cp -R -f configs/scripts/* /usr/local/bin/
+
+echo -e "$CNT - Alacritty config..."
 mkdir -p $HOME/.config/alacritty
 ln -sf $HOME/.config/configs/alacritty/alacritty.yml $HOME/.config/alacritty/alacritty.yml
 
+echo -e "$CNT - Midnight commander config..."
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 

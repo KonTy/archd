@@ -5066,7 +5066,7 @@ updatewmhints(Client *c)
 
 void setbackground(int tag) {
     char cmd[256];
-    snprintf(cmd, sizeof(cmd), "%s/.config/configs/dwm/set-background.sh %d &", getenv("HOME"), tag);
+    snprintf(cmd, sizeof(cmd), "set-background %d &", tag);
     system(cmd);
 }
 
