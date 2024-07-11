@@ -638,17 +638,32 @@ function link_all_scripts() {
         return 1
     fi
 
+    local CNT=0
+    local ERROR_FLAG=0
+
     # Loop through all files in source_dir and create symlinks in target_dir
     for file in "$source_dir"/*; do
         if [ -f "$file" ]; then
             local file_name=$(basename "$file")
-            ln -sf "$file" "$target_dir/$file_name"
-            echo "$CNT [OK] Linked '$file_name' to '$target_dir'"
+            sudo ln -sf "$file" "$target_dir/$file_name"
+            if [ $? -ne 0 ]; then
+                echo "[ERROR] Failed to link '$file_name' to '$target_dir'"
+                ERROR_FLAG=1
+            else
+                echo "[OK] Linked '$file_name' to '$target_dir'"
+                ((CNT++))
+            fi
         fi
     done
 
-    echo "$CNT - Linking completed."
+    if [ $ERROR_FLAG -ne 0 ]; then
+        echo "[ERROR] Some files could not be linked."
+        return 1
+    else
+        echo "Linking completed successfully."
+    fi
 }
+
 
 # Function to ask for sudo password once
 ask_for_sudo() {
