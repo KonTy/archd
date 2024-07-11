@@ -367,7 +367,7 @@
  * toggled in unison when vanitygaps are toggled. Increasing or decreasing gaps during runtime
  * will not affect the bar padding.
  */
-#define BAR_PADDING_VANITYGAPS_PATCH 0
+#define BAR_PADDING_VANITYGAPS_PATCH 1
 
 /* Smart bar padding patch that automatically adjusts the padding when there is
  * only one client on the monitor. Works well with vanitygaps and barpadding
