@@ -661,7 +661,8 @@ fi
 # echo -e "$CNT - Cleaning out conflicting xdg portals..."
 # yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
 
-make_scripts_executable "$HOME/.config/configs/scripts"
+# make_scripts_executable "$HOME/.config/configs/scripts"
+make_scripts_executable "configs/scripts"
 
 echo -e "$CNT - Copying config files..."
 # copy the configs directory
@@ -669,7 +670,7 @@ sudo cp -R -f configs "$HOME/.config/"
 
 echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
 # sudo cp -R -f configs/scripts/* "$HOME/.local/bin"
-sudo cp -R -f "configs/scripts/*" "/usr/local/bin"
+sudo cp -R -f configs/scripts/* /usr/local/bin/
 
 
 
