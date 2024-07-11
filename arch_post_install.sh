@@ -663,13 +663,14 @@ fi
 
 echo -e "$CNT - Copying config files..."
 # copy the configs directory
-cp -R -u configs "$HOME/.config/"
+sudo cp -R -f configs "$HOME/.config/"
 
 echo -e "$CNT - Copying scripts to bin do dwmblocks could access them..."
-cp -R -u configs/scripts "$HOME/.local/bin"
+sudo cp -R -f configs/scripts "$HOME/.local/bin"
+sudo cp -R -f configs/scripts "/usr/local/bin"
 
 make_scripts_executable "$HOME/.config/configs/scripts"
-make_scripts_executable "$HOME/.local/bin"
+make_scripts_executable "/usr/local/bin"
 
 # ********************************************************************
 # Config files 
