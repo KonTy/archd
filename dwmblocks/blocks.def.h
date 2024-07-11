@@ -18,17 +18,17 @@
 
 static const Block blocks[] = {
     /*Icon*/    /*Command*/                                       /*Update Interval*/   /*Update Signal*/
-    {" 📦 ",    HOME_CMD(".config/configs/scripts/pacupdate.sh"), 36000,                1},
-    {"",        HOME_CMD(".config/configs/scripts/volume.sh --geticon"),     1,          10},  // Left click (volume)
-    {"",        HOME_CMD(".config/configs/scripts/volume.sh --getmicicon"),  1,          11},  // Right click (mic)
-    {"",        HOME_CMD(".config/configs/scripts/weather.sh"),               300,        2},
-    {"🧠 ",     HOME_CMD(".config/configs/scripts/memory.sh"),                6,          1},
-    {" 🌐 ",    HOME_CMD(".config/configs/scripts/bandwidth.sh wlo1"),        2,          1},
-    {" 🔆 ",    HOME_CMD(".config/configs/scripts/brightness.sh"),            6,          1},
-    {"",        HOME_CMD(".config/configs/scripts/battery.sh"),               5,          2},
-    {"",        HOME_CMD(".config/configs/scripts/internet.sh"),              5,          0},
-    {"",        HOME_CMD(".config/configs/scripts/vpn.sh"),                   10,         0},
-    {"🗓 ",     HOME_CMD(".config/configs/scripts/clock.sh"),                 10,         0},
+    {" 📦 ",    "pacupdate.sh", 36000,                1},
+    {"",        "volume.sh --geticon",     1,          10},  // Left click (volume)
+    {"",        "volume.sh --getmicicon",  1,          11},  // Right click (mic)
+    {"",        "weather.sh",               300,        2},
+    {"🧠 ",     "memory.sh",                6,          1},
+    {" 🌐 ",    "bandwidth.sh wlo1",        2,          1},
+    {" 🔆 ",    "brightness.sh",            6,          1},
+    {"",        "battery.sh",               5,          2},
+    {"",        "internet.sh",              5,          0},
+    {"",        "vpn.sh",                   10,         0},
+    {"🗓 ",     "clock.sh",                 10,         0},
 };
 
 // {"🐝", "bumblebee",         5,                    2}, // hybrid video TODO
