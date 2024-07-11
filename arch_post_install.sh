@@ -628,13 +628,13 @@ function link_all_scripts() {
 
     # Check if source_dir exists and is a directory
     if [ ! -d "$source_dir" ]; then
-        echo "Error: Source directory '$source_dir' does not exist."
+        echo "[ERROR] Source directory '$source_dir' does not exist."
         return 1
     fi
 
     # Check if target_dir exists and is a directory
     if [ ! -d "$target_dir" ]; then
-        echo "Error: Target directory '$target_dir' does not exist."
+        echo "[ERROR] Target directory '$target_dir' does not exist."
         return 1
     fi
 
@@ -643,11 +643,11 @@ function link_all_scripts() {
         if [ -f "$file" ]; then
             local file_name=$(basename "$file")
             ln -sf "$file" "$target_dir/$file_name"
-            echo "Linked '$file_name' to '$target_dir'"
+            echo "$CNT [OK] Linked '$file_name' to '$target_dir'"
         fi
     done
 
-    echo "Linking completed."
+    echo "$CNT - Linking completed."
 }
 
 # clear the screen
