@@ -25,7 +25,7 @@ cd "$(dirname "$0")"
 # how to show windows title
 # invoke hybernation
 # set computer so it goes to sleep hybernaes after some time
-# set background swww img ~/.config/configs/backgrounds/$VER'-background-dark.jpg'
+# set background swww img $HOME/.config/configs/backgrounds/$VER'-background-dark.jpg'
 # auto detect surface 
 # auto detect and install intel video
 # auto detect and install amd video
@@ -186,20 +186,20 @@ function setup_backgrounds() {
     # Path to your background images directory
     backgrounds_dir="$HOME/.config/configs/backgrounds"
     
-    # Check if ~/.xprofile exists and if background setting section exists
+    # Check if $HOME/.xprofile exists and if background setting section exists
     if [ -f "$HOME/.xprofile" ]; then
         if ! grep -q "set-background.sh" "$HOME/.xprofile"; then
-            # Append call to set-background.sh in ~/.xprofile
+            # Append call to set-background.sh in $HOME/.xprofile
             echo >> "$HOME/.xprofile"
             echo "# Set background based on current desktop tag" >> "$HOME/.xprofile"
             echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
             
             echo "Background setup completed. Please restart your X session to apply changes."
         else
-            echo "Background setup already exists in ~/.xprofile. No changes made."
+            echo "Background setup already exists in $HOME/.xprofile. No changes made."
         fi
     else
-        # Create ~/.xprofile and add background setting section
+        # Create $HOME/.xprofile and add background setting section
         echo "# Set background based on current desktop tag" > "$HOME/.xprofile"
         echo "/bin/bash $HOME/.config/configs/scripts/set-background.sh 1 &" >> "$HOME/.xprofile"
         
@@ -231,20 +231,20 @@ EOF'
         return 1
     fi
 
-    # Create ~/.xprofile file with dwm if it does not exist
-    if [ ! -f ~/.xprofile ]; then
-        cat > ~/.xprofile << EOF
+    # Create $HOME/.xprofile file with dwm if it does not exist
+    if [ ! -f $HOME/.xprofile ]; then
+        cat > $HOME/.xprofile << EOF
 #!/bin/sh
 exec dwm
 EOF
-        chmod +x ~/.xprofile
-        echo "Created ~/.xprofile with exec dwm."
+        chmod +x $HOME/.xprofile
+        echo "Created $HOME/.xprofile with exec dwm."
     else
-        if ! grep -q "exec dwm" ~/.xprofile; then
-            echo "exec dwm" >> ~/.xprofile
-            echo "Appended exec dwm to ~/.xprofile."
+        if ! grep -q "exec dwm" $HOME/.xprofile; then
+            echo "exec dwm" >> $HOME/.xprofile
+            echo "Appended exec dwm to $HOME/.xprofile."
         else
-            echo "~/.xprofile already contains exec dwm."
+            echo "$HOME/.xprofile already contains exec dwm."
         fi
     fi
     
@@ -325,7 +325,7 @@ function install_custom_theme() {
 
     # Set GTK_THEME environment variable
     echo "export GTK_THEME=$THEME_NAME" >> "$HOME/.profile"
-    echo "export GTK_THEME=$THEME_NAME" >> "$HOME/.bashrc" # or ~/.zshrc, depending on your shell
+    echo "export GTK_THEME=$THEME_NAME" >> "$HOME/.bashrc" # or $HOME/.zshrc, depending on your shell
 
     echo "Created and applied the $THEME_NAME theme."
 }
@@ -405,22 +405,22 @@ function make_scripts_executable() {
 
 function setup_slock_for_dwm() {
     
-   # Check if ~/.xprofile exists and does not already contain slock setup
-    if [ -f ~/.xprofile ] && ! grep -q 'slock' ~/.xprofile; then
-        # Add slock setup to ~/.xprofile
-        cat >> ~/.xprofile <<'EOF'
+   # Check if $HOME/.xprofile exists and does not already contain slock setup
+    if [ -f $HOME/.xprofile ] && ! grep -q 'slock' $HOME/.xprofile; then
+        # Add slock setup to $HOME/.xprofile
+        cat >> $HOME/.xprofile <<'EOF'
 
 # Start xautolock to automatically lock the screen after 10 minutes of inactivity
 xautolock -time 10 -locker slock &
 
 EOF
-        echo "slock setup added to ~/.xprofile."
+        echo "slock setup added to $HOME/.xprofile."
     else
-        echo "slock setup already exists in ~/.xprofile or ~/.xprofile does not exist."
+        echo "slock setup already exists in $HOME/.xprofile or $HOME/.xprofile does not exist."
     fi
 
-    # Make ~/.xprofile executable
-    chmod +x ~/.xprofile
+    # Make $HOME/.xprofile executable
+    chmod +x $HOME/.xprofile
 }
 
 function setup_hibernation_after_idle() {
@@ -521,26 +521,26 @@ function install_yay() {
 }
 
 function setup_dunst() {
-    # Check if ~/.xprofile exists and does not already contain dunst setup
-    if [ -f ~/.xprofile ] && ! grep -q 'dunst &' ~/.xprofile; then
-        # Add dunst setup to ~/.xprofile
-        cat >> ~/.xprofile <<'EOF'
+    # Check if $HOME/.xprofile exists and does not already contain dunst setup
+    if [ -f $HOME/.xprofile ] && ! grep -q 'dunst &' $HOME/.xprofile; then
+        # Add dunst setup to $HOME/.xprofile
+        cat >> $HOME/.xprofile <<'EOF'
 # Start Dunst for notifications
 dunst &
 EOF
-        echo "Dunst setup added to ~/.xprofile."
+        echo "Dunst setup added to $HOME/.xprofile."
     else
-        echo "Dunst setup already exists in ~/.xprofile or ~/.xprofile does not exist."
+        echo "Dunst setup already exists in $HOME/.xprofile or $HOME/.xprofile does not exist."
     fi
 
-    ln -sf ~/.config/configs/dunst/dunstrc ~/.config/dunst/dunstrc
+    ln -sf $HOME/.config/configs/dunst/dunstrc $HOME/.config/dunst/dunstrc
 }
 
 function setup_picom() {
-    # Add picom startup command to ~/.xprofile if not already present
+    # Add picom startup command to $HOME/.xprofile if not already present
     # Source and destination paths
-    src_file=~/.config/configs/picom/picom.conf
-    dest_file=~/.config/picom.conf
+    src_file=$HOME/.config/configs/picom/picom.conf
+    dest_file=$HOME/.config/picom.conf
 
     # Check if the destination file already exists
     if [ -f "$dest_file" ]; then
@@ -551,14 +551,14 @@ function setup_picom() {
     # Create the symbolic link
     ln -sf "$src_file" "$dest_file"
 
-    if ! grep -q "picom --config ~/.config/picom.conf &" ~/.xprofile; then
-        echo >> ~/.xprofile
-        echo "# Start picom" >> ~/.xprofile
-        echo "picom --config ~/.config/picom.conf &" >> ~/.xprofile
+    if ! grep -q "picom --config $HOME/.config/picom.conf &" $HOME/.xprofile; then
+        echo >> $HOME/.xprofile
+        echo "# Start picom" >> $HOME/.xprofile
+        echo "picom --config $HOME/.config/picom.conf &" >> $HOME/.xprofile
         # --experimental-backends 
-        echo "Added picom startup command to ~/.xprofile"
+        echo "Added picom startup command to $HOME/.xprofile"
     else
-        echo "Picom startup command already exists in ~/.xprofile"
+        echo "Picom startup command already exists in $HOME/.xprofile"
     fi
 
     echo "Transparency setup completed. Please restart your X session to apply changes."
@@ -636,19 +636,19 @@ install_software audio_stage
 install_nvidia
 
 # this is for debugging only, remove this logic later
-if [ -f "~/.xprofile" ]; then
+if [ -f "$HOME/.xprofile" ]; then
     # Delete the file
-    rm -f "~/.xprofile"
-    echo "~/.xprofile has been deleted."
+    rm -f "$HOME/.xprofile"
+    echo "$HOME/.xprofile has been deleted."
 else
-    echo "~/.xprofile does not existn no need to delete it"
+    echo "$HOME/.xprofile does not existn no need to delete it"
 fi
 
 compile_app slock
 compile_app dwm
 compile_app dwmblocks
 
-make_scripts_executable "~/.config/configs/scripts"
+make_scripts_executable "$HOME/.config/configs/scripts"
 
 setup_backgrounds
 setup_slock_for_dwm
@@ -672,36 +672,33 @@ setup_video_hibernation
 
 echo -e "$CNT - Copying config files..."
 # copy the configs directory
-cp -R -u configs ~/.config/
+cp -R -u configs $HOME/.config/
 # ********************************************************************
 # Config files 
 # ********************************************************************
 echo -e "$CNT - Setting up the new config..." 
 
 # Ensure destination directories exist
-mkdir -p ~/.config/kitty
-ln -sf ~/.config/configs/kitty/kitty.conf ~/.config/kitty/kitty.conf
+mkdir -p $HOME/.config/kitty
+ln -sf $HOME/.config/configs/kitty/kitty.conf $HOME/.config/kitty/kitty.conf
 
-mkdir -p ~/.config/wlogout
-ln -sf ~/.config/configs/wlogout/layout ~/.config/wlogout/layout
+mkdir -p $HOME/.config/rofi
+ln -sf $HOME/.config/configs/rofi/config.rasi $HOME/.config/rofi/config.rasi
+ln -sf $HOME/.config/configs/rofi/theme.rasi $HOME/.config/rofi/theme.rasi
 
-mkdir -p ~/.config/rofi
-ln -sf ~/.config/configs/rofi/config.rasi ~/.config/rofi/config.rasi
-ln -sf ~/.config/configs/rofi/theme.rasi ~/.config/rofi/theme.rasi
+mkdir -p $HOME/.config/alacritty
+ln -sf $HOME/.config/configs/alacritty/alacritty.yml $HOME/.config/alacritty/alacritty.yml
 
-mkdir -p ~/.config/alacritty
-ln -sf ~/.config/configs/alacritty/alacritty.yml ~/.config/alacritty/alacritty.yml
-
-sudo cp -f -u ~/.config/configs/mc/ini ~/.config/mc/ini 
-sudo cp -f -u ~/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
+sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
+sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
 
 # ********************************************************************
 # setup the first look and feel as dark
 # ********************************************************************
 
-# mkdir -p ~/.themes
-# cp -r -f -d -u ~/.config/configs/gtktheme/Arc-BLACKEST ~/.themes/
+# mkdir -p $HOME/.themes
+# cp -r -f -d -u $HOME/.config/configs/gtktheme/Arc-BLACKEST $HOME/.themes/
 # xfconf-query -c xsettings -p /Net/ThemeName -s "BWnB-GTK"
 # xfconf-query -c xsettings -p /Net/IconThemeName -s "BWnB-GTK"
 # xfconf-query -c xsettings -p /Gtk/CursorThemeName -s "BWnB-GTK"
@@ -712,18 +709,18 @@ sudo cp -f -u ~/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 # xfconf-query -c xsettings -p /Net/IconThemeName -s "Papirus-Dark"
 # gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
 # gsettings set org.gnome.desktop.interface icon-theme "Papirus-Dark"
-# cp -f ~/.config/configs/backgrounds/background-dark.jpg /usr/share/sddm/themes/sdt/wallpaper.jpg
+# cp -f $HOME/.config/configs/backgrounds/background-dark.jpg /usr/share/sddm/themes/sdt/wallpaper.jpg
 
 # ********************************************************************
 # Install the starship shell 
 # ********************************************************************
 echo -e "$CNT - Install Starship"
 echo -e "$CNT - Updating .bashrc..."
-add_if_not_exists 'eval "$(starship init bash)"' ~/.bashrc
-add_if_not_exists 'eval "$(starship init zsh)"' ~/.zshrc
-echo -e "$CNT - copying starship config file to ~/.config ..."
-mkdir -p ~/.config
-cp -f -u configs/starship/starship.toml ~/.config/
+add_if_not_exists 'eval "$(starship init bash)"' $HOME/.bashrc
+add_if_not_exists 'eval "$(starship init zsh)"' $HOME/.zshrc
+echo -e "$CNT - copying starship config file to $HOME/.config ..."
+mkdir -p $HOME/.config
+cp -f -u configs/starship/starship.toml $HOME/.config/
 
 # ********************************************************************
 # sddm section
