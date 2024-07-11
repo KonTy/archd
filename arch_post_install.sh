@@ -393,11 +393,12 @@ function make_scripts_executable() {
         return 1
     fi
 
+    chmod 755 "$script_dir"
     # Loop through all files in the directory and apply chmod +x
     for file in "$script_dir"/*; do
         if [ -f "$file" ]; then
             chmod +x "$file"
-            echo "Made executable: $file"
+            echo "[OK] Made executable: $file"
         fi
     done
 }
