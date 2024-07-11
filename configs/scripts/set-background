@@ -13,4 +13,5 @@ image_index=$((tag + 1))
 background_image="$BACKGROUND_DIR/bg${image_index}.jpg"
 
 # Set the background using Variety with fade effect
-variety-cli set-fade "$background_image" --fade-in 0.8 --fade-out 0.8
+# variety-cli set-fade "$background_image" --fade-in 0.8 --fade-out 0.8
+feh --bg-scale "$background_image"
