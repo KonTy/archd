@@ -3,20 +3,8 @@
 date '+%H:%M'
 
 
-case $BLOCK_BUTTON in
-    1)
-        $TERMINAL -e sh -c 'echo "Left Button Clicked"; read -p "Press Enter to close..."'
-        ;;
-    2)
-        pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Middle Button"  # Debug message for the click event
-        && $TERMINAL -e sh -c 'echo "Middle Button Clicked"; read -p "Press Enter to close..."'
-        ;;
-    3)
-        pgrep -x dunst >/dev/null && notify-send "Debug: Clicked on Right Button"  # Debug message for the click event
-        && notify-send "📅 Time/date module" "\
-        - Left click to show upcoming appointments for the next three days via \`calcurse -d3\` and show the month via \`cal\`
-        - Middle click opens calcurse if installed"
-        ;;
+case $BUTTON in
+   *) notify-send $BUTTON
 esac
 
 # case $BLOCK_BUTTON in
