@@ -1,6 +1,32 @@
-# ~/.config/alacritty/alacritty.toml
-
 # Font configuration
 [font]
 normal = { family = "Hack", style = "Regular" }
 size = 14.0  # Adjust the font size as needed
+
+# Colors
+[colors]
+[colors.primary]
+background = "0x000000"  # Black background
+foreground = "0x00FF00"  # Bright green foreground
+
+# Normal colors
+[colors.normal]
+black = "0x000000"
+red = "0xFF0000"  # Bright red for errors
+green = "0x00FF00"
+yellow = "0xFFFF00"
+blue = "0x0000FF"
+magenta = "0xFF00FF"
+cyan = "0x00FFFF"
+white = "0xFFFFFF"
+
+# Bright colors
+[colors.bright]
+black = "0x555555"
+red = "0xFF5555"  # Bright red
+green = "0x55FF55"
+yellow = "0xFFFF55"
+blue = "0x5555FF"
+magenta = "0xFF55FF"
+cyan = "0x55FFFF"
+white = "0xFFFFFF"
