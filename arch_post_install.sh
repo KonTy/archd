@@ -749,7 +749,7 @@ link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
 
 echo -e "$CNT - Alacritty config..."
 mkdir -p $HOME/.config/alacritty
-ln -sf $HOME/.config/configs/alacritty/alacritty.yml $HOME/.config/alacritty/alacritty.yml
+ln -sf $HOME/.config/configs/alacritty/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 
 echo -e "$CNT - Midnight commander config..."
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
