@@ -1344,9 +1344,10 @@ static const Command commands[] = {
 
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
-    { ClkStatusText,        0,              Button1,        spawn,          SHCMD("st -e echo 'Left click detected!'") },
-    { ClkStatusText,        0,              Button2,        spawn,          SHCMD("st -e echo 'Middle click detected!'") },
-    { ClkStatusText,        0,              Button3,        spawn,          SHCMD("st -e echo 'Right click detected!'") },
+    { ClkStatusText,        0,              Button1,        spawn,          SHCMD("st -e sh -c 'echo Left click detected!; read -p \"Press any key to continue...\"'") },
+    { ClkStatusText,        0,              Button2,        spawn,          SHCMD("st -e sh -c 'echo Middle click detected!; read -p \"Press any key to continue...\"'") },
+    { ClkStatusText,        0,              Button3,        spawn,          SHCMD("st -e sh -c 'echo Right click detected!; read -p \"Press any key to continue...\"'") },
+    // Other button configurations
 };
 
 // static const Button buttons[] = {
