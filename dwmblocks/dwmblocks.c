@@ -196,27 +196,49 @@ void sighandler(int signum)
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 {
-	char button[2] = {'0' + si->si_value.sival_int & 0xff, '\0'};
-	pid_t process_id = getpid();
-	sig = si->si_value.sival_int >> 8;
-	if (fork() == 0)
-	{
-		const Block *current;
-		for (int i = 0; i < LENGTH(blocks); i++)
-		{
-			current = blocks + i;
-			if (current->signal == sig)
-				break;
-		}
-		char shcmd[1024];
-		sprintf(shcmd,"%s && kill -%d %d",current->command, current->signal+34,process_id);
-		char *command[] = { "/bin/sh", "-c", shcmd, NULL };
-		setenv("BLOCK_BUTTON", button, 1);
-		setsid();
-		execvp(command[0], command);
-		exit(EXIT_SUCCESS);
-	}
+    char button[2];
+    button[0] = '0' + (si->si_value.sival_int & 0xff);
+    button[1] = '\0';
+
+    pid_t process_id = getpid();
+    sig = si->si_value.sival_int >> 8;
+
+    if (fork() == 0)
+    {
+        const Block *current = NULL;
+        for (int i = 0; i < LENGTH(blocks); i++)
+        {
+            if (blocks[i].signal == sig)
+            {
+                current = &blocks[i];
+                break;
+            }
+        }
+
+        if (current)
+        {
+            char shcmd[1024];
+            snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
+
+            char *command[] = { "/bin/sh", "-c", shcmd, NULL };
+            setenv("BLOCK_BUTTON", button, 1);
+            setsid();
+
+            // Launch st to print the button number
+            if (fork() == 0) {
+                char *st_cmd[] = { "st", "-e", "sh", "-c", "echo $BLOCK_BUTTON; exec sh", NULL };
+                execvp(st_cmd[0], st_cmd);
+                perror("execvp st");
+                exit(EXIT_FAILURE);
+            }
+
+            execvp(command[0], command);
+            perror("execvp");
+        }
+        exit(EXIT_SUCCESS);
+    }
 }
+
 
 #endif
 
