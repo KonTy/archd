@@ -1,0 +1,1 @@
+bash arch_post_install.sh
