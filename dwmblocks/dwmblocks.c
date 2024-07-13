@@ -222,23 +222,18 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
+
+char *st_cmd[] = { "st", "-e", "sh", "-c", "echo $BLOCK_BUTTON; exec sh", NULL };
+execvp(st_cmd[0], st_cmd);
+perror("execvp st");
+
             setsid();
-
-            // Launch st to print the button number
-            if (fork() == 0) {
-                char *st_cmd[] = { "st", "-e", "sh", "-c", "echo $BLOCK_BUTTON; exec sh", NULL };
-                execvp(st_cmd[0], st_cmd);
-                perror("execvp st");
-                exit(EXIT_FAILURE);
-            }
-
             execvp(command[0], command);
-            perror("execvp");
+            perror("execvp");  // In case execvp fails
         }
         exit(EXIT_SUCCESS);
     }
 }
-
 
 #endif
 
