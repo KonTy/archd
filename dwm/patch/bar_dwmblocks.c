@@ -30,11 +30,6 @@ sigstatusbar(const Arg *arg)
 {
 	union sigval sv;
 
-    // Temporary debug line
-    char command[256];
-    snprintf(command, sizeof(command), "st -e sh -c 'echo \"Button %d clicked!\"; read -p \"Press any key to continue...\"'", arg->i);
-    system(command);
-
 	if (!statussig)
 		return;
 	if ((statuspid = getstatusbarpid()) <= 0)
