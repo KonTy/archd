@@ -194,8 +194,23 @@ void sighandler(int signum)
 	writestatus();
 }
 
+#include <stdio.h> // Include for perror and printf
+
+
+
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 {
+    // Launch st to print the incoming parameters for debugging
+    if (fork() == 0)
+    {
+        char *st_cmd[] = { "st", "-e", "sh", "-c", 
+            "echo Buttonhandler called; echo sig=$sig; echo si->si_value.sival_int=$((si->si_value.sival_int)); exec sh", NULL };
+        execvp(st_cmd[0], st_cmd);
+        perror("execvp st initial debug");
+        exit(EXIT_FAILURE);
+    }
+
+    // Extract the button number
     char button[2];
     button[0] = '0' + (si->si_value.sival_int & 0xff);
     button[1] = '\0';
@@ -223,17 +238,82 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
 
-char *st_cmd[] = { "st", "-e", "sh", "-c", "echo $BLOCK_BUTTON; exec sh", NULL };
-execvp(st_cmd[0], st_cmd);
-perror("execvp st");
+            // Launch st to print the button number and debug info
+            char *st_cmd[] = { "st", "-e", "sh", "-c", "echo BLOCK_BUTTON=$BLOCK_BUTTON; echo shcmd=$shcmd; exec sh", NULL };
+            execvp(st_cmd[0], st_cmd);
+            perror("execvp st");
 
             setsid();
             execvp(command[0], command);
             perror("execvp");  // In case execvp fails
         }
+        else
+        {
+            // Debug: print if no matching block is found
+            printf("No matching block found for signal: %d\n", sig);
+        }
         exit(EXIT_SUCCESS);
     }
+    else
+    {
+        // Debug: print if fork fails
+        perror("fork");
+    }
 }
+
+
+// void buttonhandler(int sig, siginfo_t *si, void *ucontext)
+// {
+//     char button[2];
+//     button[0] = '0' + (si->si_value.sival_int & 0xff);
+//     button[1] = '\0';
+
+//     pid_t process_id = getpid();
+//     sig = si->si_value.sival_int >> 8;
+
+//     if (fork() == 0)
+//     {
+//         const Block *current = NULL;
+//         for (int i = 0; i < LENGTH(blocks); i++)
+//         {
+//             if (blocks[i].signal == sig)
+//             {
+//                 current = &blocks[i];
+//                 break;
+//             }
+//         }
+
+//         if (current)
+//         {
+//             char shcmd[1024];
+//             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
+
+//             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
+//             setenv("BLOCK_BUTTON", button, 1);
+
+//             // Launch st to print the button number and debug info
+//             char *st_cmd[] = { "st", "-e", "sh", "-c", "echo BLOCK_BUTTON=$BLOCK_BUTTON; echo shcmd=$shcmd; exec sh", NULL };
+//             execvp(st_cmd[0], st_cmd);
+//             perror("execvp st");
+
+//             setsid();
+//             execvp(command[0], command);
+//             perror("execvp");  // In case execvp fails
+//         }
+//         else
+//         {
+//             // Debug: print if no matching block is found
+//             printf("No matching block found for signal: %d\n", sig);
+//         }
+//         exit(EXIT_SUCCESS);
+//     }
+//     else
+//     {
+//         // Debug: print if fork fails
+//         perror("fork");
+//     }
+// }
+
 
 #endif
 
