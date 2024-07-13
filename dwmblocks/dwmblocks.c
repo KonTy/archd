@@ -7,6 +7,11 @@
 #define LENGTH(X)               (sizeof(X) / sizeof (X[0]))
 #define CMDLENGTH		50
 
+// Declare the global log file handle
+FILE *log_file = NULL;
+void cleanup(void);
+
+
 typedef struct {
 	char* icon;
 	char* command;
@@ -38,6 +43,14 @@ static char statusbar[LENGTH(blocks)][CMDLENGTH] = {0};
 static char statusstr[2][256];
 static int statusContinue = 1;
 static void (*writestatus) () = setroot;
+
+void cleanup(void)
+{
+    if (log_file) {
+        fclose(log_file);
+    }
+}
+
 
 void replace(char *str, char old, char new)
 {
@@ -194,22 +207,16 @@ void sighandler(int signum)
 	writestatus();
 }
 
-#include <stdio.h> // Include for perror and printf
-
-
-
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 {
-    // Launch st to print the incoming parameters for debugging
-    if (fork() == 0)
-    {
-        char *st_cmd[] = { "st", "-e", "sh", "-c", 
-            "echo Buttonhandler called; echo sig=$sig; echo si->si_value.sival_int=$((si->si_value.sival_int)); exec sh", NULL };
-        execvp(st_cmd[0], st_cmd);
-        perror("execvp st initial debug");
-        exit(EXIT_FAILURE);
-    }
 
+	if (log_file) {
+        fprintf(log_file, "Buttonhandler called\n");
+        fprintf(log_file, "sig: %d\n", sig);
+        fprintf(log_file, "si->si_value.sival_int: %d\n", si->si_value.sival_int);
+        fflush(log_file);
+    }
+    
     // Extract the button number
     char button[2];
     button[0] = '0' + (si->si_value.sival_int & 0xff);
@@ -238,10 +245,12 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
 
-            // Launch st to print the button number and debug info
-            char *st_cmd[] = { "st", "-e", "sh", "-c", "echo BLOCK_BUTTON=$BLOCK_BUTTON; echo shcmd=$shcmd; exec sh", NULL };
-            execvp(st_cmd[0], st_cmd);
-            perror("execvp st");
+            // Log the button number and command
+            if (log_file) {
+                fprintf(log_file, "Button: %s\n", button);
+                fprintf(log_file, "Command: %s\n", shcmd);
+                fflush(log_file);
+            }
 
             setsid();
             execvp(command[0], command);
@@ -325,6 +334,16 @@ void termhandler(int signum)
 
 int main(int argc, char** argv)
 {
+
+    log_file = fopen("/var/log/dwmblocks.log", "a");
+    if (log_file == NULL) {
+        perror("fopen log file");
+        return EXIT_FAILURE;
+    }
+
+    // Register cleanup function to close the log file on exit
+    atexit(cleanup);
+	
 	for(int i = 0; i < argc; i++)
 	{
 		if (!strcmp("-d",argv[i]))
