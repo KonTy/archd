@@ -2,16 +2,62 @@
 
 # The clickable help menu. Middle click to restart wm.
 
-# If dwm is running, use dwm's readme and restart.
-pidof dwm >/dev/null &&
-	READMEFILE=/usr/local/share/dwm/larbs.mom
-	restartwm() { pkill -HUP dwm ;} ||
-		restartwm() { i3 restart ;}
 
+#!/bin/sh
+
+# Function to restart the window manager
+restartwm() {
+  pidof dwm >/dev/null && pkill -HUP dwm || i3 restart
+}
+
+# Define the readme file path
+READMEFILE=/usr/local/share/dwm/larbs.mom
+
+# Define terminal and editor if not already defined
+TERMINAL=${TERMINAL:-st}
+EDITOR=${EDITOR:-vi}
+
+# Handle button clicks
 case $BLOCK_BUTTON in
-	1) groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura - ;;
-	2) restartwm ;;
-	3) notify-send "❓ Help module" "\- Left click to open LARBS guide.
+  1) 
+    setsid -f st -e echo "Left Click detected" &
+    groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura - & ;;
+  2) 
+    setsid -f st -e echo "Middle Click detected" &
+    restartwm ;;
+  3) 
+    setsid -f st -e echo "Right Click detected" &
+    notify-send "❓ Help module" "\- Left click to open LARBS guide.
 - Middle click to refresh window manager." ;;
-	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac; echo "❓"
+  6) 
+    setsid -f st -e echo "Shift-Right Click detected" &
+    setsid -f "$TERMINAL" -e "$EDITOR" "$0" & ;;
+  8) 
+    setsid -f st -e echo "Shift-Left Click detected" & ;;
+  9) 
+    setsid -f st -e echo "Shift-Right Click detected" & ;;
+  10) 
+    setsid -f st -e echo "Shift-Middle Click detected" & ;;
+  *) 
+    setsid -f st -e echo "Button $BLOCK_BUTTON Click detected" & ;;
+esac
+
+# Display a generic icon or message
+echo "❓"
+
+
+
+
+# # If dwm is running, use dwm's readme and restart.
+# pidof dwm >/dev/null &&
+# 	READMEFILE=/usr/local/share/dwm/larbs.mom
+# 	restartwm() { pkill -HUP dwm ;} ||
+# 		restartwm() { i3 restart ;}
+
+# case $BLOCK_BUTTON in
+# 	1) groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura - ;;
+# 	2) restartwm ;;
+# 	3) notify-send "❓ Help module" "\- Left click to open LARBS guide.
+# - Middle click to refresh window manager." ;;
+# 	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
+# esac; echo "❓"
