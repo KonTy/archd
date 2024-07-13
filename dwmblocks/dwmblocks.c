@@ -89,7 +89,7 @@ void log_info(const char *format, ...)
 
 void replace(char *str, char old, char new)
 {
-	log_info("replace:: called \n");
+//	log_info("replace:: called \n");
 
 	int N = strlen(str);
 	for(int i = 0; i < N; i++)
@@ -98,7 +98,7 @@ void replace(char *str, char old, char new)
 }
 
 void remove_all(char *str, char to_remove) {
-	log_info("remove_all:: called \n");
+//	log_info("remove_all:: called \n");
 
 	char *read = str;
 	char *write = str;
@@ -115,7 +115,7 @@ void remove_all(char *str, char to_remove) {
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
-	log_info("getcmd:: called \n");
+//	log_info("getcmd:: called \n");
 
 	if (block->signal)
 	{
@@ -141,7 +141,7 @@ void getcmd(const Block *block, char *output)
 
 void getcmds(int time)
 {
-	log_info("setupsgetcmdsignals:: called $d\n", time);
+//	log_info("getcmds:: called $d\n", time);
 
 	const Block* current;
 	for(int i = 0; i < LENGTH(blocks); i++)
@@ -155,7 +155,7 @@ void getcmds(int time)
 #ifndef __OpenBSD__
 void getsigcmds(int signal)
 {
-	log_info("getsigcmds:: called $d\n", signal);
+//	log_info("getsigcmds:: called $d\n", signal);
 
 
 	const Block *current;
@@ -198,7 +198,7 @@ void setupsignals()
 
 int getstatus(char *str, char *last)
 {
-	log_info("getstatus:: called\n");
+	//log_info("getstatus:: called\n");
 
 	strcpy(last, str);
 	str[0] = '\0';
@@ -213,7 +213,7 @@ int getstatus(char *str, char *last)
 
 void setroot()
 {
-	log_info("setroot:: called\n");
+	// log_info("setroot:: called\n");
 
 	if (!getstatus(statusstr[0], statusstr[1]))//Only set root if text has changed.
 		return;
