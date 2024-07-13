@@ -54,6 +54,11 @@ void cleanup(void)
 
 void replace(char *str, char old, char new)
 {
+	if (log_file) {
+		fprintf(log_file, "replace:: called $s\n", str);
+		fflush(log_file);
+    }
+
 	int N = strlen(str);
 	for(int i = 0; i < N; i++)
 		if(str[i] == old)
@@ -61,6 +66,11 @@ void replace(char *str, char old, char new)
 }
 
 void remove_all(char *str, char to_remove) {
+	if (log_file) {
+		fprintf(log_file, "remove_all:: called $s\n", str);
+		fflush(log_file);
+    }
+
 	char *read = str;
 	char *write = str;
 	while (*read) {
@@ -76,6 +86,11 @@ void remove_all(char *str, char to_remove) {
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
+	if (log_file) {
+		fprintf(log_file, "getcmd:: called \n");
+		fflush(log_file);
+    }
+
 	if (block->signal)
 	{
 		output[0] = block->signal;
@@ -100,6 +115,11 @@ void getcmd(const Block *block, char *output)
 
 void getcmds(int time)
 {
+	if (log_file) {
+		fprintf(log_file, "getcmds:: called $d\n", time);
+		fflush(log_file);
+    }
+
 	const Block* current;
 	for(int i = 0; i < LENGTH(blocks); i++)
 	{
@@ -112,6 +132,11 @@ void getcmds(int time)
 #ifndef __OpenBSD__
 void getsigcmds(int signal)
 {
+	if (log_file) {
+		fprintf(log_file, "getsigcmds:: called $d\n", signal);
+		fflush(log_file);
+    }
+
 	const Block *current;
 	for (int i = 0; i < LENGTH(blocks); i++)
 	{
@@ -123,6 +148,11 @@ void getsigcmds(int signal)
 
 void setupsignals()
 {
+	if (log_file) {
+		fprintf(log_file, "setupsignal:: called\n");
+		fflush(log_file);
+    }
+
 	struct sigaction sa;
 
 	for(int i = SIGRTMIN; i <= SIGRTMAX; i++)
@@ -150,6 +180,11 @@ void setupsignals()
 
 int getstatus(char *str, char *last)
 {
+	if (log_file) {
+		fprintf(log_file, "getstatus:: called\n");
+		fflush(log_file);
+    }
+
 	strcpy(last, str);
 	str[0] = '\0';
     for(int i = 0; i < LENGTH(blocks); i++) {
@@ -163,6 +198,11 @@ int getstatus(char *str, char *last)
 
 void setroot()
 {
+		if (log_file) {
+		fprintf(log_file, "setroot:: called\n");
+		fflush(log_file);
+    }
+
 	if (!getstatus(statusstr[0], statusstr[1]))//Only set root if text has changed.
 		return;
 	Display *d = XOpenDisplay(NULL);
@@ -177,6 +217,11 @@ void setroot()
 
 void pstdout()
 {
+		if (log_file) {
+		fprintf(log_file, "pstdout:: called\n");
+		fflush(log_file);
+    }
+
 	if (!getstatus(statusstr[0], statusstr[1]))//Only write out if text has changed.
 		return;
 	printf("%s\n",statusstr[0]);
@@ -186,6 +231,10 @@ void pstdout()
 
 void statusloop()
 {
+	if (log_file) {
+		fprintf(log_file, "statusloop:: called\n");
+		fflush(log_file);
+    }
 #ifndef __OpenBSD__
 	setupsignals();
 #endif
@@ -203,6 +252,10 @@ void statusloop()
 #ifndef __OpenBSD__
 void sighandler(int signum)
 {
+		if (log_file) {
+		fprintf(log_file, "sighandler:: called\n");
+		fflush(log_file);
+    }
 	getsigcmds(signum-SIGRTMIN);
 	writestatus();
 }
