@@ -75,7 +75,6 @@ int gcd(int a, int b)
 	return a;
 }
 
-
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {

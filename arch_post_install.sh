@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 #notes
 # sudo pacman -S rofi
 
-
+# dwmblocks and dwm click is done using GitHub - LukeSmithxyz/dwmblocks:  example
 
 # TODO: how to make brave dark?
 # Install https://framagit.org/Daguhh/naivecalendar

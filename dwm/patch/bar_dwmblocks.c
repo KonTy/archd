@@ -30,6 +30,15 @@ sigstatusbar(const Arg *arg)
 {
 	union sigval sv;
 
+    // Spawn `st` with a message
+    if (fork() == 0) {
+        if (dpy)
+            close(ConnectionNumber(dpy));
+        execlp("st", "st", "-e", "sh", "-c", "echo 'sigstatusbar called with argument: ${arg->i}'; read -p 'Press any key to continue...'", (char *)NULL);
+        fprintf(stderr, "dwm: execlp 'st -e sh -c echo' failed\n");
+        exit(EXIT_SUCCESS);
+    }
+
 	if (!statussig)
 		return;
 	if ((statuspid = getstatusbarpid()) <= 0)
