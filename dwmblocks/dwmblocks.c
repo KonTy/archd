@@ -167,33 +167,67 @@ void getsigcmds(int signal)
 	}
 }
 
-void setupsignals()
-{
-	log_info("setupsignals:: called\n");
+// void setupsignals()
+// {
+// 	log_info("setupsignals:: called\n");
 
-	struct sigaction sa;
+// 	struct sigaction sa;
 
-	for(int i = SIGRTMIN; i <= SIGRTMAX; i++)
-		signal(i, SIG_IGN);
+// 	for(int i = SIGRTMIN; i <= SIGRTMAX; i++)
+// 		signal(i, SIG_IGN);
 
-	for(int i = 0; i < LENGTH(blocks); i++)
-	{
-		if (blocks[i].signal > 0)
-		{
-			signal(SIGRTMIN+blocks[i].signal, sighandler);
-			sigaddset(&sa.sa_mask, SIGRTMIN+blocks[i].signal);
-		}
-	}
-	sa.sa_sigaction = buttonhandler;
-	sa.sa_flags = SA_SIGINFO;
-	sigaction(SIGUSR1, &sa, NULL);
-	struct sigaction sigchld_action = {
-  		.sa_handler = SIG_DFL,
-  		.sa_flags = SA_NOCLDWAIT
-	};
-	sigaction(SIGCHLD, &sigchld_action, NULL);
+// 	// setup all the signals from blocks[]
+// 	for(int i = 0; i < LENGTH(blocks); i++)
+// 	{
+// 		if (blocks[i].signal > 0)
+// 		{
+// 			signal(SIGRTMIN+blocks[i].signal, sighandler);
+// 			sigaddset(&sa.sa_mask, SIGRTMIN+blocks[i].signal);
+// 		}
+// 	}
+// 	sa.sa_sigaction = buttonhandler;
+// 	sa.sa_flags = SA_SIGINFO;
+// 	sigaction(SIGUSR1, &sa, NULL);
+// 	struct sigaction sigchld_action = {
+//   		.sa_handler = SIG_DFL,
+//   		.sa_flags = SA_NOCLDWAIT
+// 	};
+// 	sigaction(SIGCHLD, &sigchld_action, NULL);
 
+// }
+
+
+void setupsignals() {
+    log_info("setupsignals:: called\n");
+
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask); // Initialize the signal mask
+
+    // Set all signals to ignore initially
+    for (int i = SIGRTMIN; i <= SIGRTMAX; i++) {
+        signal(i, SIG_IGN);
+    }
+
+    // Setup all the signals from blocks[]
+    for (int i = 0; i < LENGTH(blocks); i++) {
+        if (blocks[i].signal > 0) {
+            sa.sa_sigaction = buttonhandler; // Assign the handler
+            sa.sa_flags = SA_SIGINFO; // Use SA_SIGINFO for siginfo_t
+
+            // Set the signal handler for the specific signal
+            sigaction(SIGRTMIN + blocks[i].signal, &sa, NULL);
+        }
+    }
+
+    // Set up default action for SIGCHLD
+    struct sigaction sigchld_action = {
+        .sa_handler = SIG_DFL,
+        .sa_flags = SA_NOCLDWAIT
+    };
+    sigaction(SIGCHLD, &sigchld_action, NULL);
 }
+
+
 #endif
 
 int getstatus(char *str, char *last)
@@ -260,8 +294,10 @@ void statusloop()
 void sighandler(int signum)
 {
 	log_info("sighandler:: called\n");
-	getsigcmds(signum-SIGRTMIN);
+	getsigcmds(signum - SIGRTMIN);
 	writestatus();
+
+	
 }
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
