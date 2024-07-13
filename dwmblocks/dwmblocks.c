@@ -350,6 +350,11 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+	if (log_file) {
+        fprintf(log_file, "DWMBlocks started\n");
+        fflush(log_file);
+    }
+
     // Register cleanup function to close the log file on exit
     atexit(cleanup);
 	
