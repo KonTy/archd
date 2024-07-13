@@ -4,12 +4,15 @@
 #include<unistd.h>
 #include<signal.h>
 #include<X11/Xlib.h>
+#include<time.h> 
+#include<stdarg.h>
 #define LENGTH(X)               (sizeof(X) / sizeof (X[0]))
 #define CMDLENGTH		50
 
 // Declare the global log file handle
 FILE *log_file = NULL;
 void cleanup(void);
+void log_info(const char *format, ...);
 
 
 typedef struct {
@@ -52,12 +55,41 @@ void cleanup(void)
 }
 
 
+void log_info(const char *format, ...)
+{
+    if (!log_file) {
+        return;
+    }
+
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    char timestamp[20];
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
+
+    va_list args;
+    va_start(args, format);
+
+    fprintf(log_file, "%s ", timestamp);
+    vfprintf(log_file, format, args);
+    fprintf(log_file, "\n");
+    fflush(log_file);
+
+    va_end(args);
+}
+
+
+
+
+
+
+
+
+
+
+
 void replace(char *str, char old, char new)
 {
-	if (log_file) {
-		fprintf(log_file, "replace:: called $s\n", str);
-		fflush(log_file);
-    }
+	log_info("replace:: called \n");
 
 	int N = strlen(str);
 	for(int i = 0; i < N; i++)
@@ -66,10 +98,7 @@ void replace(char *str, char old, char new)
 }
 
 void remove_all(char *str, char to_remove) {
-	if (log_file) {
-		fprintf(log_file, "remove_all:: called $s\n", str);
-		fflush(log_file);
-    }
+	log_info("remove_all:: called \n");
 
 	char *read = str;
 	char *write = str;
@@ -86,10 +115,7 @@ void remove_all(char *str, char to_remove) {
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
-	if (log_file) {
-		fprintf(log_file, "getcmd:: called \n");
-		fflush(log_file);
-    }
+	log_info("getcmd:: called \n");
 
 	if (block->signal)
 	{
@@ -115,10 +141,7 @@ void getcmd(const Block *block, char *output)
 
 void getcmds(int time)
 {
-	if (log_file) {
-		fprintf(log_file, "getcmds:: called $d\n", time);
-		fflush(log_file);
-    }
+	log_info("setupsgetcmdsignals:: called $d\n", time);
 
 	const Block* current;
 	for(int i = 0; i < LENGTH(blocks); i++)
@@ -132,10 +155,8 @@ void getcmds(int time)
 #ifndef __OpenBSD__
 void getsigcmds(int signal)
 {
-	if (log_file) {
-		fprintf(log_file, "getsigcmds:: called $d\n", signal);
-		fflush(log_file);
-    }
+	log_info("getsigcmds:: called $d\n", signal);
+
 
 	const Block *current;
 	for (int i = 0; i < LENGTH(blocks); i++)
@@ -148,10 +169,7 @@ void getsigcmds(int signal)
 
 void setupsignals()
 {
-	if (log_file) {
-		fprintf(log_file, "setupsignal:: called\n");
-		fflush(log_file);
-    }
+	log_info("setupsignals:: called\n");
 
 	struct sigaction sa;
 
@@ -180,10 +198,7 @@ void setupsignals()
 
 int getstatus(char *str, char *last)
 {
-	if (log_file) {
-		fprintf(log_file, "getstatus:: called\n");
-		fflush(log_file);
-    }
+	log_info("getstatus:: called\n");
 
 	strcpy(last, str);
 	str[0] = '\0';
@@ -198,10 +213,7 @@ int getstatus(char *str, char *last)
 
 void setroot()
 {
-		if (log_file) {
-		fprintf(log_file, "setroot:: called\n");
-		fflush(log_file);
-    }
+	log_info("setroot:: called\n");
 
 	if (!getstatus(statusstr[0], statusstr[1]))//Only set root if text has changed.
 		return;
@@ -217,10 +229,8 @@ void setroot()
 
 void pstdout()
 {
-		if (log_file) {
-		fprintf(log_file, "pstdout:: called\n");
-		fflush(log_file);
-    }
+	
+log_info("pstdout:: called\n");
 
 	if (!getstatus(statusstr[0], statusstr[1]))//Only write out if text has changed.
 		return;
@@ -231,10 +241,7 @@ void pstdout()
 
 void statusloop()
 {
-	if (log_file) {
-		fprintf(log_file, "statusloop:: called\n");
-		fflush(log_file);
-    }
+	log_info("statusloop:: called\n");
 #ifndef __OpenBSD__
 	setupsignals();
 #endif
@@ -252,10 +259,7 @@ void statusloop()
 #ifndef __OpenBSD__
 void sighandler(int signum)
 {
-		if (log_file) {
-		fprintf(log_file, "sighandler:: called\n");
-		fflush(log_file);
-    }
+	log_info("sighandler:: called\n");
 	getsigcmds(signum-SIGRTMIN);
 	writestatus();
 }
@@ -263,12 +267,10 @@ void sighandler(int signum)
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 {
 
-	if (log_file) {
-        fprintf(log_file, "Buttonhandler called\n");
-        fprintf(log_file, "sig: %d\n", sig);
-        fprintf(log_file, "si->si_value.sival_int: %d\n", si->si_value.sival_int);
-        fflush(log_file);
-    }
+    // Log the incoming parameters
+    log_info("Buttonhandler called");
+    log_info("sig: %d", sig);
+    log_info("si->si_value.sival_int: %d", si->si_value.sival_int);
     
     // Extract the button number
     char button[2];
@@ -299,11 +301,8 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
             setenv("BLOCK_BUTTON", button, 1);
 
             // Log the button number and command
-            if (log_file) {
-                fprintf(log_file, "Button: %s\n", button);
-                fprintf(log_file, "Command: %s\n", shcmd);
-                fflush(log_file);
-            }
+            log_info("Button: %s", button);
+            log_info("Command: %s", shcmd);
 
             setsid();
             execvp(command[0], command);
