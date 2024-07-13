@@ -318,18 +318,21 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
 
     if (fork() == 0)
     {
+		log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
         for (int i = 0; i < LENGTH(blocks); i++)
         {
+			log_info("\t\tButtonhandler:: for %d == sig", blocks[i].signal, sig);
             if (blocks[i].signal == sig)
             {
                 current = &blocks[i];
                 break;
             }
         }
-
+		log_info("\t\tButtonhandler:: after for");
         if (current)
         {
+			log_info("\t\t\tButtonhandler:: current");
             char shcmd[1024];
             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
 
