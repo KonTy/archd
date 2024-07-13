@@ -211,11 +211,13 @@ void setupsignals() {
     // Setup all the signals from blocks[]
     for (int i = 0; i < LENGTH(blocks); i++) {
         if (blocks[i].signal > 0) {
+
             sa.sa_sigaction = buttonhandler; // Assign the handler
             sa.sa_flags = SA_SIGINFO; // Use SA_SIGINFO for siginfo_t
 
             // Set the signal handler for the specific signal
             sigaction(SIGRTMIN + blocks[i].signal, &sa, NULL);
+			log_info("\t\tsetupsignals:: button handeler for: %d\n", SIGRTMIN + blocks[i].signal);
         }
     }
 
@@ -296,8 +298,6 @@ void sighandler(int signum)
 	log_info("sighandler:: called\n");
 	getsigcmds(signum - SIGRTMIN);
 	writestatus();
-
-	
 }
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext)
