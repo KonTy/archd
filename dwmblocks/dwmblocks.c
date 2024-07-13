@@ -246,6 +246,12 @@ void sighandler()
 			break;
 	}
 	writestatus();
+
+  // Debug message to confirm function is called
+char command[256];
+snprintf(command, sizeof(command), "st -e sh -c 'echo sighandler:: \"Button %d clicked! Signal sent.\"; read -p \"Press any key to continue...\"'", si.ssi_int);
+system(command);
+
 }
 
 void buttonhandler(int ssi_int)
@@ -270,6 +276,16 @@ void buttonhandler(int ssi_int)
 		execvp(command[0], command);
 		exit(EXIT_SUCCESS);
 	}
+
+
+    // Spawn st terminal with a message based on the button press
+    if (fork() == 0) {
+        char cmd[50];
+        snprintf(cmd, sizeof(cmd), "echo buttonhandler:: 'Button %d pressed!' && read -p 'Press any key to continue...'", sig);
+        char *st_command[] = { "st", "-e", "sh", "-c", cmd, NULL };
+        execvp(st_command[0], st_command);
+        exit(EXIT_SUCCESS);
+    }
 }
 
 
