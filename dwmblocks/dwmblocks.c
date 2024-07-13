@@ -335,7 +335,16 @@ void termhandler(int signum)
 int main(int argc, char** argv)
 {
 
-    log_file = fopen("/var/log/dwmblocks.log", "a");
+  const char *homedir = getenv("HOME");
+    if (homedir == NULL) {
+        fprintf(stderr, "Error: Could not determine the home directory.\n");
+        return EXIT_FAILURE;
+    }
+
+    char log_path[1024];
+    snprintf(log_path, sizeof(log_path), "%s/dwmblocks.log", homedir);
+
+    log_file = fopen(log_path, "a");
     if (log_file == NULL) {
         perror("fopen log file");
         return EXIT_FAILURE;
