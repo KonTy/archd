@@ -309,11 +309,12 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
 
     // Extract the button number
     char button[2];
-    button[0] = '0' + (si->si_value.sival_int & 0xff);
+    button[0] = '0' + (si->si_value.sival_int);
     button[1] = '\0';
 
     pid_t process_id = getpid();
-    int calculated_sig = (si->si_value.sival_int >> 8) - SIGRTMIN;
+
+    int calculated_sig = sig - SIGRTMIN;
     log_info("calculated_sig: %d", calculated_sig);
 
     if (fork() == 0) {
@@ -328,7 +329,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         }
         log_info("\t\tButtonhandler:: after for");
         if (current) {
-            log_info("\t\t\tButtonhandler:: current");
+            log_info("\t\t\tButtonhandler:: current, signal=%d, button=%d", current->signal + SIGRTMIN, button);
             char shcmd[1024];
             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + SIGRTMIN, process_id);
 
