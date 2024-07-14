@@ -299,27 +299,28 @@ void sighandler(int signum)
 	getsigcmds(signum-SIGRTMIN);
 	writestatus();
 }
+
 void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     // Log the incoming parameters
     log_info("Buttonhandler called");
     log_info("sig: %d", sig);
     log_info("si->si_value.sival_int: %d", si->si_value.sival_int);
-    
+
     // Extract the button number
     char button[2];
     button[0] = '0' + (si->si_value.sival_int & 0xff);
     button[1] = '\0';
 
     pid_t process_id = getpid();
-    sig = (si->si_value.sival_int >> 8)-SIGRTMIN;
-	log_info("\tsig is: %d", sig);
+    int calculated_sig = (si->si_value.sival_int >> 8) - SIGRTMIN;
+    log_info("calculated_sig: %d", calculated_sig);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
         for (int i = 0; i < LENGTH(blocks); i++) {
-            log_info("\t\tButtonhandler:: for %d == %d", blocks[i].signal, sig);
-            if (blocks[i].signal == sig) {
+            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d", i, blocks[i].signal, calculated_sig);
+            if (blocks[i].signal == calculated_sig) {
                 current = &blocks[i];
                 break;
             }
@@ -328,7 +329,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         if (current) {
             log_info("\t\t\tButtonhandler:: current");
             char shcmd[1024];
-            snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal+34, process_id);
+            snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + SIGRTMIN, process_id);
 
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
@@ -342,7 +343,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
             perror("execvp");  // In case execvp fails
         } else {
             // Log if no matching block is found
-            log_info("No matching block found for signal: %d", sig);
+            log_info("No matching block found for signal: %d", calculated_sig);
         }
         exit(EXIT_SUCCESS);
     } else {
