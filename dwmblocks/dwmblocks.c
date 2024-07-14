@@ -317,7 +317,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     log_info("calculated_sig: %d", current_sig);
 
     if (current_sig < 0) {
-        log_info("[ERROR] calculated_sig is less than 0: %d", current_sig);
+        log_info("[ERROR] calculated_sig is less than 0: %d button: %d", current_sig, button);
         exit(EXIT_FAILURE);
     }
 
@@ -327,7 +327,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
         for (int i = 0; i < LENGTH(blocks); i++) {
-            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d", i, blocks[i].signal, current_sig);
+            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d, button = %d", i, blocks[i].signal, current_sig, button);
             if (blocks[i].signal == current_sig) {
                 current = &blocks[i];
                 break;
@@ -335,7 +335,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         }
         log_info("\t\tButtonhandler:: after for");
         if (current) {
-            log_info("\t\t\tButtonhandler:: current");
+            log_info("\t\t\tButtonhandler:: current, signal=%d, button=%d", current->signal + SIGRTMIN, button);
             char shcmd[1024];
             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + SIGRTMIN, process_id);
 
