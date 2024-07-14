@@ -298,8 +298,11 @@ void sighandler(int signum)
 	writestatus();
 }
 
+
+
+
+
 void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
-    // Log the incoming parameters
     log_info("Buttonhandler called");
     log_info("sig: %d", sig);
     log_info("si->si_value.sival_int: %d", si->si_value.sival_int);
@@ -332,7 +335,6 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
 
-            // Log the button number and command
             log_info("Button: %s", button);
             log_info("Command: %s", shcmd);
 
@@ -340,15 +342,18 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
             execvp(command[0], command);
             perror("execvp");  // In case execvp fails
         } else {
-            // Log if no matching block is found
             log_info("No matching block found for signal: %d", calculated_sig);
         }
         exit(EXIT_SUCCESS);
     } else {
-        // Log if fork fails
         perror("fork");
     }
 }
+
+
+
+
+
 
 
 // void buttonhandler(int sig, siginfo_t *si, void *ucontext)
