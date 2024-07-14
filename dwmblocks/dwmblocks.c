@@ -312,30 +312,23 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     button[0] = '0' + (si->si_value.sival_int & 0xff);
     button[1] = '\0';
 
-
-    int current_sig = sig - SIGRTMIN;
-    log_info("calculated_sig: %d", current_sig);
-
-    if (current_sig < 0) {
-        log_info("[ERROR] calculated_sig is less than 0: %d button: %d", current_sig, button);
-        exit(EXIT_FAILURE);
-    }
-
     pid_t process_id = getpid();
+    int calculated_sig = (si->si_value.sival_int >> 8) - SIGRTMIN;
+    log_info("calculated_sig: %d", calculated_sig);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
         for (int i = 0; i < LENGTH(blocks); i++) {
-            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d, button = %d", i, blocks[i].signal, current_sig, button);
-            if (blocks[i].signal == current_sig) {
+            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d", i, blocks[i].signal, calculated_sig);
+            if (blocks[i].signal == calculated_sig) {
                 current = &blocks[i];
                 break;
             }
         }
         log_info("\t\tButtonhandler:: after for");
         if (current) {
-            log_info("\t\t\tButtonhandler:: current, signal=%d, button=%d", current->signal + SIGRTMIN, button);
+            log_info("\t\t\tButtonhandler:: current");
             char shcmd[1024];
             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + SIGRTMIN, process_id);
 
@@ -349,7 +342,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
             execvp(command[0], command);
             perror("execvp");  // In case execvp fails
         } else {
-            log_info("No matching block found for signal: %d", current_sig);
+            log_info("No matching block found for signal: %d", calculated_sig);
         }
         exit(EXIT_SUCCESS);
     } else {
