@@ -296,13 +296,10 @@ void statusloop()
 void sighandler(int signum)
 {
 	log_info("sighandler:: called\n");
-	getsigcmds(signum - SIGRTMIN);
+	getsigcmds(signum-SIGRTMIN);
 	writestatus();
 }
-
-void buttonhandler(int sig, siginfo_t *si, void *ucontext)
-{
-
+void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     // Log the incoming parameters
     log_info("Buttonhandler called");
     log_info("sig: %d", sig);
@@ -314,25 +311,21 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
     button[1] = '\0';
 
     pid_t process_id = getpid();
-    sig = si->si_value.sival_int >> 8;
+    sig = (si->si_value.sival_int >> 8) - SIGRTMIN;
 
-    if (fork() == 0)
-    {
-		log_info("\tButtonhandler:: fork");
+    if (fork() == 0) {
+        log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
-        for (int i = 0; i < LENGTH(blocks); i++)
-        {
-			log_info("\t\tButtonhandler:: for %d == sig", blocks[i].signal, sig);
-            if (blocks[i].signal == sig)
-            {
+        for (int i = 0; i < LENGTH(blocks); i++) {
+            log_info("\t\tButtonhandler:: for %d == %d", blocks[i].signal, sig);
+            if (blocks[i].signal == sig) {
                 current = &blocks[i];
                 break;
             }
         }
-		log_info("\t\tButtonhandler:: after for");
-        if (current)
-        {
-			log_info("\t\t\tButtonhandler:: current");
+        log_info("\t\tButtonhandler:: after for");
+        if (current) {
+            log_info("\t\t\tButtonhandler:: current");
             char shcmd[1024];
             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
 
@@ -346,17 +339,13 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext)
             setsid();
             execvp(command[0], command);
             perror("execvp");  // In case execvp fails
-        }
-        else
-        {
-            // Debug: print if no matching block is found
-            printf("No matching block found for signal: %d\n", sig);
+        } else {
+            // Log if no matching block is found
+            log_info("No matching block found for signal: %d", sig);
         }
         exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        // Debug: print if fork fails
+    } else {
+        // Log if fork fails
         perror("fork");
     }
 }
