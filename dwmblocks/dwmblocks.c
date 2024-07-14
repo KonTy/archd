@@ -304,7 +304,7 @@ void sighandler(int signum)
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     log_info("Buttonhandler called");
-    log_info("sig: %d", sig);
+    log_info("sig: '%d'", sig);
     log_info("si->si_value.sival_int: %d", si->si_value.sival_int);
 
     // Extract the button number
