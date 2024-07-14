@@ -311,7 +311,8 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     button[1] = '\0';
 
     pid_t process_id = getpid();
-    sig = (si->si_value.sival_int >> 8) - SIGRTMIN;
+    sig = (si->si_value.sival_int >> 8)-SIGRTMIN;
+	log_info("\tsig is: %d", sig);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
@@ -327,7 +328,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         if (current) {
             log_info("\t\t\tButtonhandler:: current");
             char shcmd[1024];
-            snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
+            snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal+34, process_id);
 
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
