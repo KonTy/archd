@@ -75,8 +75,9 @@ Rectangle {
 		}
 
 		TermLabel {
-			text: `${proxy.hostName} sddm`
-			bottomPadding: contentHeight
+		/*	text: `${proxy.hostName} sddm` */
+			text: `Welcome to the Matrix ${contentHeight}`
+			bottomPadding: 0
 		}
 
 		Login {
