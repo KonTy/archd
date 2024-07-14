@@ -54,28 +54,26 @@ void cleanup(void)
     }
 }
 
-
-void log_info(const char *format, ...)
-{
-    if (!log_file) {
-        return;
-    }
-
-    time_t now = time(NULL);
-    struct tm *t = localtime(&now);
-    char timestamp[20];
-    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
-
+void log_info(const char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    fprintf(log_file, "%s ", timestamp);
-    vfprintf(log_file, format, args);
-    fprintf(log_file, "\n");
-    fflush(log_file);
+    if (log_file) {
+        time_t now = time(NULL);
+        char timestamp[20];
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+        fprintf(log_file, "[%s] ", timestamp);
+
+        vfprintf(log_file, format, args);
+        fprintf(log_file, "\n");
+
+        fflush(log_file);
+    }
 
     va_end(args);
 }
+
+
 
 
 
