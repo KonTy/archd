@@ -313,7 +313,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     button[1] = '\0';
 
     pid_t process_id = getpid();
-    int calculated_sig = (int)(si->si_value.sival_int >> 8) - SIGRTMIN;
+    int calculated_sig = (int)(si->si_value.sival_int >> 8)-(int)SIGRTMIN;
     log_info("calculated_sig: %d", calculated_sig);
 
     if (fork() == 0) {
