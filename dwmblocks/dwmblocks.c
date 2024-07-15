@@ -315,7 +315,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     pid_t process_id = getpid();
 
     int calculated_sig = sig - SIGRTMIN;
-    log_info("calculated_sig: %d", calculated_sig);
+    log_info("calculated_sig: %d, button: $d", calculated_sig, button);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
