@@ -309,13 +309,13 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
 
     // Extract the button number
     char button[2];
-    button[0] = '0' + (si->si_value.sival_int);
+    button[0] = '0' + (si->si_value.sival_int & 0xff);
     button[1] = '\0';
 
     pid_t process_id = getpid();
 
     int calculated_sig = sig - SIGRTMIN;
-    log_info("calculated_sig: %d, button: $d", calculated_sig, button);
+    log_info("calculated_sig: %d, button: %d", calculated_sig, button);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
