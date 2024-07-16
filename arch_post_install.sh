@@ -237,8 +237,8 @@ function configure_quet_systemd_boot() {
       echo "Added 'quiet' and 'loglevel=0' options."
     fi
   else
-    echo "Boot entry file $boot_entry_file not found!"
-    exit 1
+    echo "[ERROR] Boot entry file $boot_entry_file not found!"
+    return 1
   fi
 
   # Rebuild the initial ramdisk
@@ -760,7 +760,7 @@ fi
 # yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
 
 
-configure_quet_systemd_boot
+# configure_quet_systemd_boot
 
 make_scripts_executable "configs/scripts"
 
