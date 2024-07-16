@@ -40,9 +40,10 @@ case $BLOCK_BUTTON in
     setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' & ;;
   10) 
     setsid -f st -e sh -c 'echo "Shift-Middle Click detected"; exec sh' & ;;
-  *) 
-    setsid -f st -e sh -c 'echo "Button $BLOCK_BUTTON Click detected"; exec sh' & ;;
 esac
+
+#  *) 
+#     setsid -f st -e sh -c 'echo "Button $BLOCK_BUTTON Click detected"; exec sh' & ;;
 
 # Display a generic icon or message
 echo "❓"
