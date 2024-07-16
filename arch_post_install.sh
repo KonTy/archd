@@ -211,6 +211,24 @@ function setup_backgrounds() {
     fi
 }
 
+function add_dunst_to_autostart() {
+    local xprofile="$HOME/.xprofile"
+    local dunst_command="dunst &"
+
+    # Create .xprofile if it doesn't exist
+    if [ ! -f "$xprofile" ]; then
+        touch "$xprofile"
+    fi
+
+    # Remove old dunst command if exists and add the new one
+    if grep -q "^dunst" "$xprofile"; then
+        sed -i '/^dunst/d' "$xprofile"
+    fi
+
+    echo "$dunst_command" >> "$xprofile"
+    echo "Dunst has been added to $xprofile for autostart."
+}
+
 function configure_quet_systemd_boot() {
   # Get the UUID of the root partition
   local root_uuid=$(findmnt -no UUID /)
@@ -798,6 +816,7 @@ compile_app slock
 compile_app dwm
 compile_app dwmblocks
 setup_backgrounds
+add_dunst_to_autostart
 setup_slock_for_dwm
 setup_hibernation_after_idle
 setup_picom
