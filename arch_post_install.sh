@@ -119,8 +119,6 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
-
-        [Dunst]="notification service"
     [gtk2-engines-murrine]="GTK+ theme tools for custom theme support "
     [papirus-icon-theme]="Icon theme for Linux"
     [lxappearance]="GTK+ theme switcher"
@@ -209,24 +207,6 @@ function setup_backgrounds() {
         
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
-}
-
-function add_dunst_to_autostart() {
-    local xprofile="$HOME/.xprofile"
-    local dunst_command="dunst &"
-
-    # Create .xprofile if it doesn't exist
-    if [ ! -f "$xprofile" ]; then
-        touch "$xprofile"
-    fi
-
-    # Remove old dunst command if exists and add the new one
-    if grep -q "^dunst" "$xprofile"; then
-        sed -i '/^dunst/d' "$xprofile"
-    fi
-
-    echo "$dunst_command" >> "$xprofile"
-    echo "Dunst has been added to $xprofile for autostart."
 }
 
 function configure_quet_systemd_boot() {
@@ -579,22 +559,6 @@ function install_yay() {
     fi
 }
 
-function setup_dunst() {
-    # Check if $HOME/.xprofile exists and does not already contain dunst setup
-    if [ -f $HOME/.xprofile ] && ! grep -q 'dunst &' $HOME/.xprofile; then
-        # Add dunst setup to $HOME/.xprofile
-        cat >> $HOME/.xprofile <<'EOF'
-# Start Dunst for notifications
-dunst &
-EOF
-        echo "Dunst setup added to $HOME/.xprofile."
-    else
-        echo "Dunst setup already exists in $HOME/.xprofile or $HOME/.xprofile does not exist."
-    fi
-
-    ln -sf $HOME/.config/configs/dunst/dunstrc $HOME/.config/dunst/dunstrc
-}
-
 function setup_picom() {
     # Add picom startup command to $HOME/.xprofile if not already present
     # Source and destination paths
@@ -623,7 +587,6 @@ function setup_picom() {
     echo "Transparency setup completed. Please restart your X session to apply changes."
 }
 
-
 function is_vm() {
     # attempt to discover if this is a VM or not
     echo -e "$CNT - Checking for Physical or VM..."
@@ -635,7 +598,6 @@ function is_vm() {
         sleep 1
     fi
 }
-
 
 function setup_video_hibernation() {
     # Step 1: Create the monitor script
@@ -678,6 +640,24 @@ EOF
     sudo systemctl start monitor_video.service
 
     echo "Video playback monitoring and hibernation setup complete."
+}
+
+function add_dunst_to_autostart() {
+    local xprofile="$HOME/.xprofile"
+    local dunst_command="dunst &"
+
+    # Create .xprofile if it doesn't exist
+    if [ ! -f "$xprofile" ]; then
+        touch "$xprofile"
+    fi
+
+    # Remove old dunst command if exists and add the new one
+    if grep -q "^dunst" "$xprofile"; then
+        sed -i '/^dunst/d' "$xprofile"
+    fi
+
+    echo "$dunst_command" >> "$xprofile"
+    echo "Dunst has been added to $xprofile for autostart."
 }
 
 # Function definition
@@ -723,7 +703,6 @@ function link_all_scripts() {
     fi
 }
 
-
 # Function to ask for sudo password once
 ask_for_sudo() {
     # Prompt for sudo password once
@@ -764,20 +743,13 @@ fi
 
 
 # TODO: 
-# setup_dunst
-# echo -e "$CNT - Installing main components..."
-# install_software install_stage
-
 # Start the bluetooth service
 # echo -e "$CNT - Starting the Bluetooth Service..."
 # sudo systemctl enable --now bluetooth.service &>> $INSTLOG
 # sleep 2
-   
 # Clean out other portals
 # echo -e "$CNT - Cleaning out conflicting xdg portals..."
 # yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
-
-
 # configure_quet_systemd_boot
 
 make_scripts_executable "configs/scripts"
@@ -791,24 +763,23 @@ sudo cp -R -f configs "$HOME/.config/"
 # ********************************************************************
 echo -e "$CNT - Setting up the new config..." 
 
-# Ensure destination directories exist
-# mkdir -p $HOME/.config/kitty
-# ln -sf $HOME/.config/configs/kitty/kitty.conf $HOME/.config/kitty/kitty.conf
-
-# mkdir -p $HOME/.config/rofi
-# ln -sf $HOME/.config/configs/rofi/config.rasi $HOME/.config/rofi/config.rasi
-# ln -sf $HOME/.config/configs/rofi/theme.rasi $HOME/.config/rofi/theme.rasi
-
+mkdir -p $HOME/.config/rofi
+sudo cp -Rf $HOME/.config/configs/rofi/* $HOME/.config/rofi/
 
 echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
 # link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
 sudo cp -Rf configs/scripts/* /usr/local/bin/
 
+echo -e "$CNT - Copy dunst config..."
+sudo mkdir -p $$HOME/.config/dunst/
+sudo cp -Rf $HOME/.config/configs/dunst/* $HOME/.config/dunst/
+
 echo -e "$CNT - Alacritty config..."
-mkdir -p $HOME/.config/alacritty
-ln -sf $HOME/.config/configs/alacritty/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+sudo mkdir -p $HOME/.config/alacritty/
+sudo cp -Rf $HOME/.config/configs/alacritty/* $HOME/.config/alacritty/
 
 echo -e "$CNT - Midnight commander config..."
+sudo mkdir -p $HOME/.config/mc/
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
@@ -860,7 +831,6 @@ sudo cp -R -u sddm/TerminalStyleLogin /usr/share/sddm/themes/
 sudo chown -R $USER:$USER /usr/share/sddm/themes/TerminalStyleLogin
 sudo mkdir /etc/sddm.conf.d
 echo -e "[Theme]\nCurrent=TerminalStyleLogin" | sudo tee -a /etc/sddm.conf.d/10-theme.conf &>> $INSTLOG
-
 
 # Enable the sddm login manager service
 echo -e "$CNT - Enabling the SDDM Service..."

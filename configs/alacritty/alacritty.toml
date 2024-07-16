@@ -1,7 +1,7 @@
 # Font configuration
 [font]
-normal = { family = "Hack", style = "Regular" }
-size = 14.0  # Adjust the font size as needed
+normal = { family = "mono", style = "Regular" }
+size = 12.0  # Adjust the font size as needed
 
 # Colors
 [colors]

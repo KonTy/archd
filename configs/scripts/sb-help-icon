@@ -36,20 +36,16 @@ case $BLOCK_BUTTON in
         ;;
     6) 
         log "Shift-Right Click detected"
-        setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
         setsid -f "$TERMINAL" -e "$EDITOR" "$0" &
         ;;
     8) 
         log "Shift-Left Click detected"
-        setsid -f st -e sh -c 'echo "Shift-Left Click detected"; exec sh' &
         ;;
     9) 
         log "Shift-Right Click detected"
-        setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
         ;;
     10) 
         log "Shift-Middle Click detected"
-        setsid -f st -e sh -c 'echo "Shift-Middle Click detected"; exec sh' &
         ;;
 esac
 

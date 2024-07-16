@@ -1,22 +1,36 @@
 # Dunst configuration file
 
 [global]
-font = Monospace 10
-markup = full
-format = "<b>%s</b>\n%b"
+    font = Monospace 10
+    markup = full
+    format = "<b>%s</b>\n%b"
+    font = Monospace 12
+    icon_theme = Papirus
+    icon_position = left
+    icon_size = 32
+    font = "Font Awesome 5 Free 12"
+    markup = yes
 
-# Customize colors as per your preference
+
+[frame]
+    width = 2
+    color = "#00ff00"
+    corner_radius = 8
+
 [urgency_low]
-foreground = #ffffff
-background = #333333
+    background = "#004400"
+    foreground = "#00ff00"
+    frame_color = "#00ff00"
+    timeout = 10
 
 [urgency_normal]
-foreground = #ffffff
-background = #285577
+    background = "#000000"
+    foreground = "#00ff00"
+    frame_color = "#00ff00"
+    timeout = 10
 
 [urgency_critical]
-foreground = #ffffff
-background = #ff3333
-
-# Specify the monitor where notifications should appear (optional)
-# monitor = HDMI-A-0
+    background = "#440000"
+    foreground = "#ff0000"
+    frame_color = "#ff0000"
+    timeout = 0
