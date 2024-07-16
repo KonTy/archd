@@ -238,20 +238,18 @@ void sighandler(int signum)
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     log_info("Buttonhandler called");
-    log_info("sig: '%d'", sig);
     int button_pressed = si->si_value.sival_int & 0xff;
-    log_info("si->si_value.sival_int: '%d'", button_pressed);
-
-    // Extract the button number
-    char button[2] = { '0' + (ssi_int & 0xff), '\0' };
+    log_info("sig: '%d' :: si->si_value.sival_int: '%d'", sig, button_pressed);
+    // need bigger buffer since we support shift clicks etc button go beyond 9
+    snprintf(button, sizeof(button), "%d", button_pressed);
     int calculated_sig = sig - SIGRTMIN;
-    log_info("calculated_sig: %d, button: %d", calculated_sig, button);
+    log_info("calculated_sig: %d, button: %s", calculated_sig, button);
 
     if (fork() == 0) {
         log_info("\tButtonhandler:: fork");
         const Block *current = NULL;
         for (int i = 0; i < LENGTH(blocks); i++) {
-            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d", i, blocks[i].signal, calculated_sig);
+            log_info("\t\tButtonhandler:: checking blocks[%d].signal = %d against calculated_sig = %d and button %s", i, blocks[i].signal, calculated_sig, button);
             if (blocks[i].signal == calculated_sig) {
                 current = &blocks[i];
                 break;
@@ -266,10 +264,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
 
             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
             setenv("BLOCK_BUTTON", button, 1);
-
-            log_info("Button: %s", button);
-            log_info("Command: %s", shcmd);
-
+            log_info("Command: %s :: Button: %s", shcmd, button);
             setsid();
             execvp(command[0], command);
             perror("execvp");  // In case execvp fails
