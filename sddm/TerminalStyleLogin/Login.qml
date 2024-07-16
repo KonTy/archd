@@ -39,7 +39,7 @@ Column {
 
 		TermLabel {
 			id: usernameLabel
-			text: ` ` 
+			text: `` 
 			//text: `${proxy.hostName} login: `
 		}
 
@@ -65,14 +65,14 @@ Column {
 		TermLabel {
 			id: passwordLabel
 			// text: "Password: "
-			text: " "
+			text: ''
 		}
 
 		TermInput {
 			id: passwordInput
 
 			echoMode: TextInput.NoEcho
-			text: ""
+			text: ''
 
 			onAccepted: {
 				passwordInput.readOnly = true

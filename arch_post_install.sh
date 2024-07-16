@@ -211,6 +211,43 @@ function setup_backgrounds() {
     fi
 }
 
+function configure_quet_systemd_boot() {
+  # Get the UUID of the root partition
+  local root_uuid=$(findmnt -no UUID /)
+  
+  # Check if UUID was found
+  if [ -z "$root_uuid" ]; then
+    echo "Failed to get root partition UUID."
+    exit 1
+  fi
+
+  # Path to the systemd-boot entry file
+  local boot_entry_file="/boot/loader/entries/arch.conf"
+
+  # Update the boot entry file
+  if [ -f "$boot_entry_file" ]; then
+    echo "Updating $boot_entry_file with quiet and loglevel=0"
+
+    # Check if 'quiet' and 'loglevel=0' are already present
+    if grep -q 'quiet' "$boot_entry_file" && grep -q 'loglevel=0' "$boot_entry_file"; then
+      echo "'quiet' and 'loglevel=0' options are already present."
+    else
+      # Add 'quiet' and 'loglevel=0' options if they are not present
+      sudo sed -i "s/options .*/options root=UUID=${root_uuid} rw quiet loglevel=0/" "$boot_entry_file"
+      echo "Added 'quiet' and 'loglevel=0' options."
+    fi
+  else
+    echo "Boot entry file $boot_entry_file not found!"
+    exit 1
+  fi
+
+  # Rebuild the initial ramdisk
+  echo "Rebuilding initial ramdisk..."
+  sudo mkinitcpio -P
+
+  echo "Configuration completed. Please reboot to apply changes."
+}
+
 function add_dwm_to_sddm() {
     # Check if dwm.desktop file already exists
     if [ ! -f /usr/share/xsessions/dwm.desktop ]; then
@@ -722,7 +759,9 @@ fi
 # echo -e "$CNT - Cleaning out conflicting xdg portals..."
 # yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
 
-# make_scripts_executable "$HOME/.config/configs/scripts"
+
+configure_quet_systemd_boot
+
 make_scripts_executable "configs/scripts"
 
 echo -e "$CNT - Copying config files..."
