@@ -1,14 +1,15 @@
 #!/bin/sh
 
-# The clickable help menu. Middle click to restart wm.
+LOGFILE=~/sb-help.log
 
-
-#!/bin/sh
-
+# Function to log messages
+log() {
+    echo "$(date): $1" >> $LOGFILE
+}
 
 # Function to restart the window manager
 restartwm() {
-  pidof dwm >/dev/null && pkill -HUP dwm || i3 restart
+    pidof dwm >/dev/null && pkill -HUP dwm || i3 restart
 }
 
 # Define the readme file path
@@ -20,33 +21,42 @@ EDITOR=${EDITOR:-vi}
 
 # Handle button clicks
 case $BLOCK_BUTTON in
-  1) 
-    # setsid -f st -e sh -c 'echo "Left Click detected"; exec sh' &
-    xdg-open "https://larbs.xyz/guide.html"
-#    groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura -  & ;;
-  2) 
-    setsid -f st -e sh -c 'echo "Middle Click detected"; echo "Press Enter to exit"; read' &
-    # restartwm ;;
-  3) 
-    # setsid -f st -e sh -c 'echo "Right Click detected"; exec sh' &
-    notify-send "❓ Help module" "\- Left click to open LARBS guide. - Middle click to refresh window manager." ;;
-    setsid -f st -e sh -c 'echo "Right Click detected"; echo "Press Enter to exit"; read' &
-  6) 
-    setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
-    setsid -f "$TERMINAL" -e "$EDITOR" "$0" & ;;
-  8) 
-    setsid -f st -e sh -c 'echo "Shift-Left Click detected"; exec sh' & ;;
-  9) 
-    setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' & ;;
-  10) 
-    setsid -f st -e sh -c 'echo "Shift-Middle Click detected"; exec sh' & ;;
+    1) 
+        log "Left Click detected"
+        xdg-open "https://larbs.xyz/guide.html" &
+        ;;
+    2) 
+        log "Middle Click detected"
+        setsid -f st -e sh -c 'echo "Middle Click detected"; echo "Press Enter to exit"; read' &
+        ;;
+    3) 
+        log "Right Click detected"
+        notify-send "❓ Help module" "\- Left click to open LARBS guide. - Middle click to refresh window manager."
+        setsid -f st -e sh -c 'echo "Right Click detected"; echo "Press Enter to exit"; read' &
+        ;;
+    6) 
+        log "Shift-Right Click detected"
+        setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
+        setsid -f "$TERMINAL" -e "$EDITOR" "$0" &
+        ;;
+    8) 
+        log "Shift-Left Click detected"
+        setsid -f st -e sh -c 'echo "Shift-Left Click detected"; exec sh' &
+        ;;
+    9) 
+        log "Shift-Right Click detected"
+        setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
+        ;;
+    10) 
+        log "Shift-Middle Click detected"
+        setsid -f st -e sh -c 'echo "Shift-Middle Click detected"; exec sh' &
+        ;;
 esac
 
-#  *) 
-#     setsid -f st -e sh -c 'echo "Button $BLOCK_BUTTON Click detected"; exec sh' & ;;
-
-# Display a generic icon or message
+log "Displaying generic icon or message"
 echo "❓"
+
+
 
 # # If dwm is running, use dwm's readme and restart.
 # pidof dwm >/dev/null &&
