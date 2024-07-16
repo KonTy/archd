@@ -783,8 +783,8 @@ echo -e "$CNT - Setting up the new config..."
 
 
 echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
-link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
-# sudo cp -R -f configs/scripts/* /usr/local/bin/
+# link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
+sudo cp -Rf configs/scripts/* /usr/local/bin/
 
 echo -e "$CNT - Alacritty config..."
 mkdir -p $HOME/.config/alacritty

@@ -242,6 +242,7 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     log_info("sig: '%d' :: si->si_value.sival_int: '%d'", sig, button_pressed);
     // need bigger buffer since we support shift clicks etc button go beyond 9
     snprintf(button, sizeof(button), "%d", button_pressed);
+
     int calculated_sig = sig - SIGRTMIN;
     log_info("calculated_sig: %d, button: %s", calculated_sig, button);
 
