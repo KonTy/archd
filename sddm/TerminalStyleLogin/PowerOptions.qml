@@ -106,7 +106,7 @@ Column {
 				})
 			}
 
-			const dispOptions = "Power"]
+			const dispOptions = ["---POWER OPTIONS---"]
 
 			options.forEach((o) => dispOptions.push(`${o.number} - ${o.text}`))
 
