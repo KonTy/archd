@@ -28,8 +28,7 @@ case $BLOCK_BUTTON in
     restartwm ;;
   3) 
     setsid -f st -e sh -c 'echo "Right Click detected"; exec sh' &
-    notify-send "❓ Help module" "\- Left click to open LARBS guide.
-- Middle click to refresh window manager." ;;
+    notify-send "❓ Help module" "\- Left click to open LARBS guide. - Middle click to refresh window manager." ;;
   6) 
     setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
     setsid -f "$TERMINAL" -e "$EDITOR" "$0" & ;;
@@ -45,9 +44,6 @@ esac
 
 # Display a generic icon or message
 echo "❓"
-
-
-
 
 # # If dwm is running, use dwm's readme and restart.
 # pidof dwm >/dev/null &&

@@ -6,14 +6,13 @@
 #include<X11/Xlib.h>
 #include<time.h> 
 #include<stdarg.h>
-#define LENGTH(X)               (sizeof(X) / sizeof (X[0]))
+#define LENGTH(X) (sizeof(X) / sizeof (X[0]))
 #define CMDLENGTH		50
 
 // Declare the global log file handle
 FILE *log_file = NULL;
 void cleanup(void);
 void log_info(const char *format, ...);
-
 
 typedef struct {
 	char* icon;
@@ -35,7 +34,6 @@ int getstatus(char *str, char *last);
 void setroot();
 void statusloop();
 void termhandler(int signum);
-
 
 #include "config.h"
 
@@ -73,22 +71,8 @@ void log_info(const char *format, ...) {
     va_end(args);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void replace(char *str, char old, char new)
 {
-//	log_info("replace:: called \n");
-
 	int N = strlen(str);
 	for(int i = 0; i < N; i++)
 		if(str[i] == old)
@@ -96,8 +80,6 @@ void replace(char *str, char old, char new)
 }
 
 void remove_all(char *str, char to_remove) {
-//	log_info("remove_all:: called \n");
-
 	char *read = str;
 	char *write = str;
 	while (*read) {
@@ -113,8 +95,6 @@ void remove_all(char *str, char to_remove) {
 //opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
-//	log_info("getcmd:: called \n");
-
 	if (block->signal)
 	{
 		output[0] = block->signal;
@@ -139,8 +119,6 @@ void getcmd(const Block *block, char *output)
 
 void getcmds(int time)
 {
-//	log_info("getcmds:: called $d\n", time);
-
 	const Block* current;
 	for(int i = 0; i < LENGTH(blocks); i++)
 	{
@@ -153,9 +131,6 @@ void getcmds(int time)
 #ifndef __OpenBSD__
 void getsigcmds(int signal)
 {
-//	log_info("getsigcmds:: called $d\n", signal);
-
-
 	const Block *current;
 	for (int i = 0; i < LENGTH(blocks); i++)
 	{
@@ -164,36 +139,6 @@ void getsigcmds(int signal)
 			getcmd(current,statusbar[i]);
 	}
 }
-
-// void setupsignals()
-// {
-// 	log_info("setupsignals:: called\n");
-
-// 	struct sigaction sa;
-
-// 	for(int i = SIGRTMIN; i <= SIGRTMAX; i++)
-// 		signal(i, SIG_IGN);
-
-// 	// setup all the signals from blocks[]
-// 	for(int i = 0; i < LENGTH(blocks); i++)
-// 	{
-// 		if (blocks[i].signal > 0)
-// 		{
-// 			signal(SIGRTMIN+blocks[i].signal, sighandler);
-// 			sigaddset(&sa.sa_mask, SIGRTMIN+blocks[i].signal);
-// 		}
-// 	}
-// 	sa.sa_sigaction = buttonhandler;
-// 	sa.sa_flags = SA_SIGINFO;
-// 	sigaction(SIGUSR1, &sa, NULL);
-// 	struct sigaction sigchld_action = {
-//   		.sa_handler = SIG_DFL,
-//   		.sa_flags = SA_NOCLDWAIT
-// 	};
-// 	sigaction(SIGCHLD, &sigchld_action, NULL);
-
-// }
-
 
 void setupsignals() {
     log_info("setupsignals:: called\n");
@@ -226,14 +171,10 @@ void setupsignals() {
     };
     sigaction(SIGCHLD, &sigchld_action, NULL);
 }
-
-
 #endif
 
 int getstatus(char *str, char *last)
 {
-	//log_info("getstatus:: called\n");
-
 	strcpy(last, str);
 	str[0] = '\0';
     for(int i = 0; i < LENGTH(blocks); i++) {
@@ -247,8 +188,6 @@ int getstatus(char *str, char *last)
 
 void setroot()
 {
-	// log_info("setroot:: called\n");
-
 	if (!getstatus(statusstr[0], statusstr[1]))//Only set root if text has changed.
 		return;
 	Display *d = XOpenDisplay(NULL);
@@ -263,8 +202,7 @@ void setroot()
 
 void pstdout()
 {
-	
-log_info("pstdout:: called\n");
+    log_info("pstdout:: called\n");
 
 	if (!getstatus(statusstr[0], statusstr[1]))//Only write out if text has changed.
 		return;
@@ -297,10 +235,6 @@ void sighandler(int signum)
 	getsigcmds(signum-SIGRTMIN);
 	writestatus();
 }
-
-
-
-
 
 void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
     log_info("Buttonhandler called");
@@ -347,66 +281,6 @@ void buttonhandler(int sig, siginfo_t *si, void *ucontext) {
         perror("fork");
     }
 }
-
-
-
-
-
-
-
-// void buttonhandler(int sig, siginfo_t *si, void *ucontext)
-// {
-//     char button[2];
-//     button[0] = '0' + (si->si_value.sival_int & 0xff);
-//     button[1] = '\0';
-
-//     pid_t process_id = getpid();
-//     sig = si->si_value.sival_int >> 8;
-
-//     if (fork() == 0)
-//     {
-//         const Block *current = NULL;
-//         for (int i = 0; i < LENGTH(blocks); i++)
-//         {
-//             if (blocks[i].signal == sig)
-//             {
-//                 current = &blocks[i];
-//                 break;
-//             }
-//         }
-
-//         if (current)
-//         {
-//             char shcmd[1024];
-//             snprintf(shcmd, sizeof(shcmd), "%s && kill -%d %d", current->command, current->signal + 34, process_id);
-
-//             char *command[] = { "/bin/sh", "-c", shcmd, NULL };
-//             setenv("BLOCK_BUTTON", button, 1);
-
-//             // Launch st to print the button number and debug info
-//             char *st_cmd[] = { "st", "-e", "sh", "-c", "echo BLOCK_BUTTON=$BLOCK_BUTTON; echo shcmd=$shcmd; exec sh", NULL };
-//             execvp(st_cmd[0], st_cmd);
-//             perror("execvp st");
-
-//             setsid();
-//             execvp(command[0], command);
-//             perror("execvp");  // In case execvp fails
-//         }
-//         else
-//         {
-//             // Debug: print if no matching block is found
-//             printf("No matching block found for signal: %d\n", sig);
-//         }
-//         exit(EXIT_SUCCESS);
-//     }
-//     else
-//     {
-//         // Debug: print if fork fails
-//         perror("fork");
-//     }
-// }
-
-
 #endif
 
 void termhandler(int signum)

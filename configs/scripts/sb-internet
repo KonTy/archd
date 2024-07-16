@@ -6,16 +6,30 @@
 
 case $BLOCK_BUTTON in
 	1) "$TERMINAL" -e nmtui; pkill -RTMIN+4 dwmblocks ;;
-	3) notify-send "🌐 Internet module" "\- Click to connect
+	3) notify-send "\uf108 Internet module" "\- Click to connect
 ❌: wifi disabled
 📡: no wifi connection
 📶: wifi connection with quality
 ❎: no ethernet
-🌐: ethernet working
+\uf108: ethernet working
 🔒: vpn is active
 " ;;
 	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
+
+# case $BLOCK_BUTTON in
+# 	1) "$TERMINAL" -e nmtui; pkill -RTMIN+4 dwmblocks ;;
+# 	3) notify-send "\uf108 Internet module" "\- Click to connect
+# ❌: wifi disabled
+# 📡: no wifi connection
+# 📶: wifi connection with quality
+# ❎: no ethernet
+# 🌐: ethernet working
+# 🔒: vpn is active
+# " ;;
+# 	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
+# esac
+
 
 # Wifi
 if [ "$(cat /sys/class/net/w*/operstate 2>/dev/null)" = 'up' ] ; then
