@@ -21,13 +21,14 @@ EDITOR=${EDITOR:-vi}
 # Handle button clicks
 case $BLOCK_BUTTON in
   1) 
-    setsid -f st -e sh -c 'echo "Left Click detected"; exec sh' &
-    groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura - & ;;
+    # setsid -f st -e sh -c 'echo "Left Click detected"; exec sh' &
+    xdg-open "https://larbs.xyz/guide.html"
+#    groff -mom "${READMEFILE:-${XDG_DATA_HOME:-$HOME/.local/share}/larbs/readme.mom}" -Tpdf | zathura -  & ;;
   2) 
     setsid -f st -e sh -c 'echo "Middle Click detected"; exec sh' &
     restartwm ;;
   3) 
-    setsid -f st -e sh -c 'echo "Right Click detected"; exec sh' &
+    # setsid -f st -e sh -c 'echo "Right Click detected"; exec sh' &
     notify-send "❓ Help module" "\- Left click to open LARBS guide. - Middle click to refresh window manager." ;;
   6) 
     setsid -f st -e sh -c 'echo "Shift-Right Click detected"; exec sh' &
