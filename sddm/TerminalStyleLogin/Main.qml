@@ -31,7 +31,7 @@ Rectangle {
 
 	states: [
 		State {
-			name: "login"
+			name: "login" // login
 			PropertyChanges {
 				target: loginForm
 				visible: true
@@ -76,8 +76,8 @@ Rectangle {
 
 		TermLabel {
 		/*	text: `${proxy.hostName} sddm` */
-			text: `Welcome to the Matrix ${contentHeight}`
-			bottomPadding: 0
+			text: `Welcome to the Matrix`
+			bottomPadding: 0 // ${contentHeight}
 		}
 
 		Login {

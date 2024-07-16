@@ -50,7 +50,7 @@ TermLabel {
 				})
 			}
 
-			const dispOptions = ["---SESSIONS---"]
+			const dispOptions = ["Sessions"]
 
 			sessions.forEach(
 				(o) => dispOptions.push(`${o.index + 1} - ${o.text}`))

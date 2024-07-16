@@ -39,7 +39,8 @@ Column {
 
 		TermLabel {
 			id: usernameLabel
-			text: `${proxy.hostName} login: `
+			text: ` ` 
+			//text: `${proxy.hostName} login: `
 		}
 
 		TermInput {
@@ -63,7 +64,8 @@ Column {
 
 		TermLabel {
 			id: passwordLabel
-			text: "Password: "
+			// text: "Password: "
+			text: " "
 		}
 
 		TermInput {
