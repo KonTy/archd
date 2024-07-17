@@ -30,11 +30,20 @@ split() {
 vol="$(printf "%.0f" "$(split "$vol" ".")")"
 
 case 1 in
-	$((vol >= 70)) ) icon="🔊" ;;
-	$((vol >= 30)) ) icon="🔉" ;;
-	$((vol >= 1)) ) icon="🔈" ;;
-	* ) echo 🔇 && exit ;;
+    $((vol == 0)) ) icon="" ;;     # Material Design Volume Mute
+    $((vol <= 20)) ) icon="" ;;    # Material Design Volume Low (no lines)
+    $((vol <= 40)) ) icon="" ;;    # Material Design Volume Medium (1 line)
+    $((vol <= 70)) ) icon="" ;;    # Material Design Volume High (2 lines)
+    $((vol > 70)) ) icon="" ;;     # Material Design Volume Very High (3 lines)
 esac
+
+
+# case 1 in
+# 	$((vol >= 70)) ) icon="🔊" ;;
+# 	$((vol >= 30)) ) icon="🔉" ;;
+# 	$((vol >= 1)) ) icon="🔈" ;;
+# 	* ) echo 🔇 && exit ;;
+# esac
 
 echo "$icon"
 //echo "$icon$vol%"
