@@ -25,17 +25,14 @@ case $BLOCK_BUTTON in
         log "Left Click detected"
         xdg-open "https://larbs.xyz/guide.html" &
         ;;
-    2) 
-        log "Middle Click detected"
+    2)  log "Middle Click detected"
         setsid -f st -e sh -c 'echo "Middle Click detected"; echo "Press Enter to exit"; read' &
         ;;
-    3) 
-        log "Right Click detected"
+    3)  log "Right Click detected"
         notify-send "❓ Help module" "\- Left click to open LARBS guide. - Middle click to refresh window manager."
         setsid -f st -e sh -c 'echo "Right Click detected"; echo "Press Enter to exit"; read' &
         ;;
-    6) 
-        log "Shift-Right Click detected"
+    6)  log "Shift-Right Click detected"
         setsid -f "$TERMINAL" -e "$EDITOR" "$0" &
         ;;
     8) 

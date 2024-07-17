@@ -10,6 +10,7 @@
     icon_size = 32
     font = "Font Awesome 5 Free 12"
     markup = yes
+    timeout = 15
 
 
 [frame]
