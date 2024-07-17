@@ -10,12 +10,11 @@
     icon_size = 32
     font = "Font Awesome 5 Free 12"
     markup = yes
-    timeout = 15
-
+    timeout = 20
 
 [frame]
-    width = 2
-    color = "#00ff00"
+    width = 1
+    color = "#00f000"
     corner_radius = 8
 
 [urgency_low]
