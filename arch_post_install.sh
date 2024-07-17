@@ -572,7 +572,7 @@ function setup_picom() {
     fi
 
     # Create the symbolic link
-    ln -sf "$src_file" "$dest_file"
+    cp -f "$src_file" "$dest_file"
 
     if ! grep -q "picom --config $HOME/.config/picom.conf &" $HOME/.xprofile; then
         echo >> $HOME/.xprofile

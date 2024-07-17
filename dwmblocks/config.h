@@ -1,7 +1,9 @@
 
 // Font configuration
-static const char *fonts[] = { "monospace:size=12", "Font Awesome 6 Free:style=Regular:pixelsize=12" };
-static const char dmenufont[] = "Nerd Font:size=12";
+static const char *fonts[] = {
+    "monospace:size=12",
+    "Font Awesome 6 Free:style=Regular:pixelsize=12"
+};
 static const int block_height = 30;
 
 //Modify this file to change what commands output to your statusbar, and recompile using the make command.
