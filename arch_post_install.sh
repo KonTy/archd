@@ -771,7 +771,7 @@ echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
 sudo cp -Rf configs/scripts/* /usr/local/bin/
 
 echo -e "$CNT - Copy dunst config..."
-sudo mkdir -p $$HOME/.config/dunst/
+sudo mkdir -p $HOME/.config/dunst/
 sudo cp -Rf $HOME/.config/configs/dunst/* $HOME/.config/dunst/
 
 echo -e "$CNT - Alacritty config..."
