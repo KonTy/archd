@@ -394,10 +394,14 @@ main(int argc, char **argv) {
 		    errno ? strerror(errno) : "user entry not found");
 	duid = pwd->pw_uid;
 	errno = 0;
-	if (!(grp = getgrnam(group)))
-		die("slock: getgrnam %s: %s\n", group,
-		    errno ? strerror(errno) : "group entry not found");
-	dgid = grp->gr_gid;
+	 if (!(grp = getgrnam(group))) {
+        fprintf(stderr, "slock: getgrnam %s: %s\n", group,
+                errno ? strerror(errno) : "group entry not found");
+        fprintf(stderr, "slock: using default group of the calling user instead\n");
+        dgid = getgid();
+    } else {
+        dgid = grp->gr_gid;
+    }
 
 #ifdef __linux__
 	dontkillme();

@@ -45,5 +45,5 @@ esac
 # 	* ) echo 🔇 && exit ;;
 # esac
 
-echo "$icon"
-//echo "$icon$vol%"
+#echo "$icon"
+echo "$icon$vol%"
