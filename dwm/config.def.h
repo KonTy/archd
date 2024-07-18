@@ -178,7 +178,7 @@ static char normbordercolor[]            = "#444444";
 static char normfloatcolor[]             = "#db8fd9";
 
 static char selfgcolor[]                 = "#eeeeee";
-static char selbgcolor[]                 = "#ff0000";
+static char selbgcolor[]                 = "#800000";
 static char selbordercolor[]             = "#005577";
 static char selfloatcolor[]              = "#005577";
 
@@ -453,7 +453,7 @@ static char tagicons[][NUMTAGS][MAX_TAGLEN] =
 static char *tagicons[][NUMTAGS] =
 #endif // NAMETAG_PATCH
 {
-	[DEFAULT_TAGS]        = { "", "", "", "", ""}, //{ "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	[DEFAULT_TAGS]        = { "", "", "", "", "", "?"}, //{ "1", "2", "3", "4", "5", "6", "7", "8", "9" },
 	[ALTERNATIVE_TAGS]    = { "A", "B", "C", "D"},
 	[ALT_TAGS_DECORATION] = { "<1>", "<2>", "<3>"},
 };
