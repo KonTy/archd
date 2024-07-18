@@ -559,6 +559,60 @@ function install_yay() {
     fi
 }
 
+# Function to set Neovim color scheme to moonfly
+function set_nvim_colorscheme_to_moonfly() {
+    # Paths to your Neovim configuration files
+    NVIM_INIT_VIM="$HOME/.config/nvim/init.vim"
+    NVIM_INIT_LUA="$HOME/.config/nvim/init.lua"
+    NVIM_BACKUP_VIM="$HOME/.config/nvim/init.vim.bak"
+    NVIM_BACKUP_LUA="$HOME/.config/nvim/init.lua.bak"
+    
+    # Check if the init.vim or init.lua exists
+    if [[ -f "$NVIM_INIT_VIM" ]]; then
+        CONFIG_FILE="$NVIM_INIT_VIM"
+        BACKUP_FILE="$NVIM_BACKUP_VIM"
+    elif [[ -f "$NVIM_INIT_LUA" ]]; then
+        CONFIG_FILE="$NVIM_INIT_LUA"
+        BACKUP_FILE="$NVIM_BACKUP_LUA"
+    else
+        echo "Neovim configuration file not found."
+        exit 1
+    fi
+
+    # Check if the vim-moonfly-colors plugin is mentioned in the configuration
+    if ! grep -q "bluz71/vim-moonfly-colors" "$CONFIG_FILE"; then
+        echo "The vim-moonfly-colors plugin is not installed in your Neovim configuration."
+        exit 1
+    fi
+
+    # Create a backup of the Neovim configuration
+    cp "$CONFIG_FILE" "$BACKUP_FILE"
+
+    # Function to set the color scheme
+    if grep -q "colorscheme moonfly" "$CONFIG_FILE"; then
+        echo "The color scheme is already set to moonfly."
+    else
+        echo "Setting Neovim color scheme to moonfly..."
+        if grep -q "colorscheme " "$CONFIG_FILE"; then
+            # Update existing colorscheme line
+            sed -i 's/colorscheme .*/colorscheme moonfly/' "$CONFIG_FILE"
+        else
+            # Add colorscheme line for vim-plug or lazy.nvim
+            if [[ "$CONFIG_FILE" == "$NVIM_INIT_VIM" ]]; then
+                echo "colorscheme moonfly" >> "$CONFIG_FILE"
+            else
+                echo "require('lazy').setup({" >> "$CONFIG_FILE"
+                echo "  'bluz71/vim-moonfly-colors'," >> "$CONFIG_FILE"
+                echo "  config = function()" >> "$CONFIG_FILE"
+                echo "    vim.cmd('colorscheme moonfly')" >> "$CONFIG_FILE"
+                echo "  end" >> "$CONFIG_FILE"
+                echo "})" >> "$CONFIG_FILE"
+            fi
+        fi
+        echo "Color scheme set to moonfly in $CONFIG_FILE."
+    fi
+}
+
 function setup_picom() {
     # Add picom startup command to $HOME/.xprofile if not already present
     # Source and destination paths
@@ -850,6 +904,8 @@ if [[ "$ISNVIDIA" == true ]]; then
     Please type 'reboot' at the prompt and hit Enter when ready."
     exit
 fi
+
+set_nvim_colorscheme_to_moonfly
 
 echo "Starting dwm..."
 add_dwm_to_sddm
