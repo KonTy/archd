@@ -165,7 +165,7 @@ static void (*bartabmonfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 static const char font[]                 = "monospace 10";
 #else
 //static const char *fonts[] = { "Nerd Font:size=14" }; // Change size as needed
-static const char *fonts[]          = { "Hack:size=9", "JoyPixels:pixelsize=9:antialias=true:autohint=true"};
+static const char *fonts[]          = { "Hack:size=14", "JoyPixels:pixelsize=9:antialias=true:autohint=true"};
 //static const char *fonts[]               = { "monospace:size=10" };
 #endif // BAR_PANGO_PATCH
 static const char dmenufont[] = "Nerd Font:size=14"; // For dmenu
@@ -178,7 +178,7 @@ static char normbordercolor[]            = "#444444";
 static char normfloatcolor[]             = "#db8fd9";
 
 static char selfgcolor[]                 = "#eeeeee";
-static char selbgcolor[]                 = "#005577";
+static char selbgcolor[]                 = "#ff0000";
 static char selbordercolor[]             = "#005577";
 static char selfloatcolor[]              = "#005577";
 
@@ -188,17 +188,17 @@ static char titlenormbordercolor[]       = "#444444";
 static char titlenormfloatcolor[]        = "#555555";
 
 static char titleselfgcolor[]            = "#00ff00";
-static char titleselbgcolor[]            = "#004400";
+static char titleselbgcolor[]            = "#000000";
 static char titleselbordercolor[]        = "#005577";
 static char titleselfloatcolor[]         = "#005577";
 
 static char tagsnormfgcolor[]            = "#bbbbbb";
-static char tagsnormbgcolor[]            = "#222222";
+static char tagsnormbgcolor[]            = "#000000";
 static char tagsnormbordercolor[]        = "#444444";
 static char tagsnormfloatcolor[]         = "#db8fd9";
 
 static char tagsselfgcolor[]             = "#eeeeee";
-static char tagsselbgcolor[]             = "#005577";
+static char tagsselbgcolor[]             = "#ff0000";
 static char tagsselbordercolor[]         = "#005577";
 static char tagsselfloatcolor[]          = "#005577";
 
@@ -658,7 +658,7 @@ static const int scrollargs[][2] = {
 #if FLEXTILE_DELUXE_LAYOUT
 static const Layout layouts[] = {
 	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis, symbol func } */
-	{ "[]=",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+	//{ "[]=",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
  	{ "><>",      NULL,             {0} },    /* no layout function means floating behavior */
 	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, MONOCLE, 0, NULL } }, // monocle
 	{ "|||",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // columns (col) layout
@@ -673,7 +673,7 @@ static const Layout layouts[] = {
 	{ "(@)",      flextile,         { -1, -1, NO_SPLIT, SPIRAL, SPIRAL, 0, NULL } }, // fibonacci spiral
 	{ "[T]",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TATAMI, 0, NULL } }, // tatami mats
 	#if TILE_LAYOUT
-	{ "[]=",      tile,             {0} },
+//	{ "[]=",      tile,             {0} },
 	#endif
 	#if MONOCLE_LAYOUT
 	{ "[M]",      monocle,          {0} },
