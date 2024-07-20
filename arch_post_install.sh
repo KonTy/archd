@@ -80,6 +80,7 @@ declare -A prep_stage=(
     [networkmanager]="Network Manager"
     [dunst]="Lightweight notification service"
     [libnotify]="command-line utility on Linux systems used to send desktop notifications"
+    [eww]="Bar for dwm"
 )
 
 #     [calcurse-git]="CLI calendar"
@@ -807,6 +808,8 @@ fi
 # configure_quet_systemd_boot
 
 make_scripts_executable "configs/scripts"
+
+sudo cp -f "$HOME/.config/scripts/autostart.sh" "$HOME/.local/share/dwm/autostart.sh"
 
 echo -e "$CNT - Copying config files..."
 # copy the configs directory
