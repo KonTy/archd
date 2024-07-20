@@ -4,9 +4,17 @@
 //     "monospace:size=12",
 //     "Font Awesome 6 Free:style=Regular:pixelsize=12"
 // };
+
+static const char *fonts[] = {
+    "JetBrainsMono Nerd Font:size=14",
+    "Font Awesome 5 Free:size=14"
+};
+
 static const int block_height = 40;
 
 //Modify this file to change what commands output to your statusbar, and recompile using the make command.
+// update signal is used to force the update for example you can tell dwmblocks to update volume when you increase decrease it
+// kill -s 10 $(pgrep dwmblocks)
 static const Block blocks[] = {
 	/*Icon*/	/*Command*/		/*Update Interval*/	/*Update Signal*/
 	/* {"⌨", "sb-kbselect", 0, 30}, */
@@ -28,7 +36,8 @@ static const Block blocks[] = {
 	// {"",	"sb-mailbox",	180,	12},
 	//{"",	"sb-nettraf",	1,	16},
 	//{"",	"sb-battery",	5,	3},
-	{"",	"sb-internet",	5,	4},
+	{"",	"sb-seccheck",	18011,	3},
+	()"",	"sb-internet",	5,	4},
 	{"",	"sb-volume",	0,	10},
 	{"",	"sb-clock",	60,	1},
 	// {"",	"sb-iplocate", 0,	27},

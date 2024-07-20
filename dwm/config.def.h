@@ -1307,7 +1307,11 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_7,                                  6)
 	TAGKEYS(                        XK_8,                                  7)
 	TAGKEYS(                        XK_9,                                  8)
-	{ SUPER,  						XK_l, 			spawn,  			SHCMD("slock &") },
+	// KonTy: Keybindings for volume and mic control
+	{ SUPER,                         XK_equal,       spawn,          SHCMD("sb-volume --inc") },        // SUPER + PLUS to increase volume
+	{ SUPER,                         XK_minus,       spawn,          SHCMD("sb-volume --dec") },        // SUPER + MINUS to decrease volume
+	{ SUPER,                         XK_BackSpace,   spawn,          SHCMD("sb-volume --toggle") },     // SUPER + Backspace to toggle mute
+	{ SUPER|ShiftMask,               XK_BackSpace,   spawn,          SHCMD("sb-volume --togglemic") },  // SUPER + SHIFT + Backspace to toggle mic mute
 };
 
 #if KEYMODES_PATCH
@@ -1369,6 +1373,7 @@ static const Button buttons[] = {
 	#endif // BAR_WINTITLEACTIONS_PATCH
 	{ ClkWinTitle,          0,                   Button2,        zoom,           {0} },
 	#if BAR_STATUSCMD_PATCH && BAR_DWMBLOCKS_PATCH
+	// KonTy: dwmblocks clicks
 	{ ClkStatusText,        0,                   Button1,        sigstatusbar,   {.i = 1 } },
 	{ ClkStatusText,        0,                   Button2,        sigstatusbar,   {.i = 2 } },
 	{ ClkStatusText,        0,                   Button3,        sigstatusbar,   {.i = 3 } },	

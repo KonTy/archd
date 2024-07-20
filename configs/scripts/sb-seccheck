@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# Set the paths to the alert log files
+OSSEC_ALERTS_LOG="/var/ossec/logs/alerts/alerts.log"
+SURICATA_ALERTS_LOG="/var/log/suricata/fast.log"
+
+# Flag to track the status of the services
+SERVICES_RUNNING=true
+
+# Function to check OSSEC alerts
+function check_ossec_alerts {
+  local icon="✓"
+  local alerts=$(grep "level 10" "$OSSEC_ALERTS_LOG")
+  if [ -n "$alerts" ]; then
+    icon="⚠️"
+    # Send notification for the latest OSSEC alert
+    alert_message=$(echo "$alerts" | tail -1 | grep -oP '(?<=Rule: \d+ \().+')
+    notify-send "OSSEC Alert (level 10)" "$alert_message"
+  fi
+  echo -n "$icon"
+}
+
+# Function to check Suricata alerts
+function check_suricata_alerts {
+  local icon="✓"
+  local alerts=$(grep "ET\|SPLIT" "$SURICATA_ALERTS_LOG") # Adjust pattern as needed
+  if [ -n "$alerts" ]; then
+    icon="⚠️"
+    # Send notification for the latest Suricata alert
+    alert_message=$(echo "$alerts" | tail -1)
+    notify-send "Suricata Alert" "$alert_message"
+  fi
+  echo -n "$icon"
+}
+
+# Function to update icons
+function update_icons {
+  local ossec_icon=$(check_ossec_alerts)
+  local suricata_icon=$(check_suricata_alerts)
+  echo "$ossec_icon $suricata_icon"
+}
+
+# Function to toggle services on/off
+function toggle_services {
+  if $SERVICES_RUNNING; then
+    # Stop services
+    sudo systemctl stop ossec
+    sudo systemctl stop suricata
+    SERVICES_RUNNING=false
+    # Update icons to indicate that services are off
+    echo "🛑 🛑"
+  else
+    # Start services
+    sudo systemctl start ossec
+    sudo systemctl start suricata
+    SERVICES_RUNNING=true
+    # Update icons to reflect the current status
+    update_icons
+  fi
+}
+
+# Handle clicks
+case $1 in
+  1)
+    # Left click: Show alerts in terminal
+    xterm -e "tail -f $OSSEC_ALERTS_LOG $SURICATA_ALERTS_LOG"
+    ;;
+  4)
+    # Shift + Left click: Toggle services
+    toggle_services
+    ;;
+  *)
+    # Default action: Update icons
+    update_icons
+    ;;
+esac

@@ -1,49 +1,99 @@
-#!/bin/sh
+#!/bin/bash
 
-# Prints the current volume or 🔇 if muted.
-
-case $BLOCK_BUTTON in
-	1) setsid -w -f "$TERMINAL" -e pulsemixer; pkill -RTMIN+10 "${STATUSBAR:-dwmblocks}" ;;
-	2) wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
-	4) wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+ ;;
-	5) wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%- ;;
-	3) notify-send "📢 Volume module" "\- Shows volume 🔊, 🔇 if muted.
-- Middle click to mute.
-- Scroll to change." ;;
-	6) setsid -f "$TERMINAL" -e "$EDITOR" "$0" ;;
-esac
-
-vol="$(wpctl get-volume @DEFAULT_AUDIO_SINK@)"
-
-# If muted, print 🔇 and exit.
-[ "$vol" != "${vol%\[MUTED\]}" ] && echo 🔇 && exit
-
-vol="${vol#Volume: }"
-
-split() {
-	# For ommiting the . without calling and external program.
-	IFS=$2
-	set -- $1
-	printf '%s' "$@"
+# Fetch the current volume as a percentage
+get_volume() {
+    wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2 * 100)}'
 }
 
-vol="$(printf "%.0f" "$(split "$vol" ".")")"
+# Fetch the mute status
+is_muted() {
+    wpctl get-mute @DEFAULT_AUDIO_SINK@ | awk '{print $2}'
+}
 
-case 1 in
-    $((vol == 0)) ) icon="" ;;     # Material Design Volume Mute
-    $((vol <= 20)) ) icon="" ;;    # Material Design Volume Low (no lines)
-    $((vol <= 40)) ) icon="" ;;    # Material Design Volume Medium (1 line)
-    $((vol <= 70)) ) icon="" ;;    # Material Design Volume High (2 lines)
-    $((vol > 70)) ) icon="" ;;     # Material Design Volume Very High (3 lines)
+# Fetch the microphone mute status
+is_mic_muted() {
+    wpctl get-mute @DEFAULT_AUDIO_SOURCE@ | awk '{print $2}'
+}
+
+# Determine the volume icon
+get_icon() {
+    local volume=$(get_volume)
+    local mute=$(is_muted)
+
+    if [ "$mute" == "true" ]; then
+        echo "🔇"  # Mute icon
+    elif [ "$volume" -eq 0 ]; then
+        echo "🔈"  # Low volume icon
+    elif [ "$volume" -lt 33 ]; then
+        echo "🔉"  # Medium volume icon
+    elif [ "$volume" -lt 67 ]; then
+        echo "🔊"  # High volume icon
+    elif [ "$volume" -le 100 ]; then
+        echo "📢"  # Very high volume icon
+    else
+        echo "📣"  # Maximum volume icon (for over 100%)
+    fi
+}
+
+# Determine the microphone icon
+get_mic_icon() {
+    local mute=$(is_mic_muted)
+
+    if [ "$mute" == "true" ]; then
+        echo "🎙️"  # Mic mute icon
+    else
+        echo "🎤"  # Mic unmute icon
+    fi
+}
+
+# Handle different actions based on arguments
+case "$1" in
+    --getvolume)
+        get_volume
+        ;;
+    --geticon)
+        get_icon
+        ;;
+    --getmicicon)
+        get_mic_icon
+        ;;
+    --inc)
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+        pkill -RTMIN+10 dwmblocks
+        ;;
+    --dec)
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+        pkill -RTMIN+10 dwmblocks
+        ;;
+    --toggle)
+        wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+        pkill -RTMIN+10 dwmblocks
+        ;;
+    --togglemic)
+        wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+        pkill -RTMIN+11 dwmblocks
+        ;;
+    *)
+        # Handle mouse click actions
+        case "$BLOCK_BUTTON" in
+            1)  # Left click (volume)
+                setsid -f "$TERMINAL" -e helvum
+                ;;
+            3)  # Right click (volume)
+                wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+                pkill -RTMIN+10 dwmblocks
+                ;;
+            4)  # Scroll up (increase volume)
+                wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+                pkill -RTMIN+10 dwmblocks
+                ;;
+            5)  # Scroll down (decrease volume)
+                wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+                pkill -RTMIN+10 dwmblocks
+                ;;
+        esac
+        ;;
 esac
 
-
-# case 1 in
-# 	$((vol >= 70)) ) icon="🔊" ;;
-# 	$((vol >= 30)) ) icon="🔉" ;;
-# 	$((vol >= 1)) ) icon="🔈" ;;
-# 	* ) echo 🔇 && exit ;;
-# esac
-
-#echo "$icon"
-echo "$icon$vol%"
+# Output the volume and microphone icons
+echo "$(get_icon) $(get_mic_icon)"

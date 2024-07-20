@@ -1,0 +1,60 @@
+%YAML 1.1
+---
+# Suricata configuration file
+# See: https://suricata.readthedocs.io/en/latest/configuration.html
+
+# Logging
+logging:
+  default-log-level: info
+  outputs:
+    - file:
+        filename: /var/log/suricata/suricata.log
+        log-type: syslog
+
+# Network Interfaces
+af-packet:
+  - interface: eth0
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+
+# Detection Engine
+detect:
+  engine:
+    - rules:
+        - /etc/suricata/rules
+
+# Rule Files
+rule-files:
+  - /etc/suricata/rules/local.rules
+
+# HTTP Log
+http-log:
+  enabled: yes
+  types:
+    - alert
+    - capture
+
+# File Log
+file-log:
+  enabled: yes
+  types:
+    - alert
+    - capture
+
+# Performance
+stats:
+  enabled: yes
+  print: yes
+
+# Alerts
+alert:
+  enabled: yes
+  filetype: json
+  file: /var/log/suricata/alerts.json
+
+# Output
+output:
+  - file:
+      filename: /var/log/suricata/suricata.log
+      log-type: syslog

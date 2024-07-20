@@ -56,6 +56,8 @@ ISNVIDIA=false
 declare -A prep_stage=(
     [base-devel]="Base development tools"
     [git]="Version control system"
+    [gcc]="Compiler"
+    [make]="Make"
     [libxext]="This library is for window effects for DWM"
     [libxrandr]="Provides an X Window System extension for dynamic resizing and rotation of X screen"
     [ttf-jetbrains-mono-nerd]="JetBrains Mono Nerd Font"
@@ -81,22 +83,34 @@ declare -A prep_stage=(
     [dunst]="Lightweight notification service"
     [libnotify]="command-line utility on Linux systems used to send desktop notifications"
     [eww]="Bar for dwm"
+    [ufw]="Uncomplicated Firewalll"
+    [fail2ban]="ban clients that try to connect several times"
+    [audit]="Audit nextwork and system"
+    [suricata]="Comprehensive network intrusion detection tool"
+    [ossec-hids-local]="Virus/Intrusion detection tool"
 )
 
 #     [calcurse-git]="CLI calendar"
 #     [dmenu]="Dynamic Menu"
 
 declare -A audio_stage=(
+    [mvp]="Multimedia player"
     [pipewire]="Multimedia server"
     [wireplumber]="PipeWire session manager"
     [pipewire-alsa]="ALSA support for PipeWire"
-    [pipewire-jack]="JACK support for PipeWire"
     [pipewire-pulse]="PulseAudio support for PipeWire"
     [alsa-utils]="ALSA utilities"
     [helvum]="GTK patchbay for PipeWire"
-    [pamixer]="Pulseaudio command-line mixer like amixer"
-    [pavucontrol]="PulseAudio Volume Control"
 )
+
+declare -A audio_stage=(
+    [pipewire]="Multimedia server"
+    [wireplumber]="PipeWire session manager"
+    [pipewire-alsa]="ALSA support for PipeWire"
+    [pipewire-pulse]="PulseAudio support for PipeWire"
+    [helvum]="GTK patchbay for PipeWire"
+)
+
 
 #software for nvidia GPU
 declare -A nvidia_stage=(
@@ -120,6 +134,9 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+    [pamixer]="Pulseaudio command-line mixer like amixer"
+    [pavucontrol]="PulseAudio Volume Control"
+    [pipewire-jack]="JACK support for PipeWire"
     [gtk2-engines-murrine]="GTK+ theme tools for custom theme support "
     [papirus-icon-theme]="Icon theme for Linux"
     [lxappearance]="GTK+ theme switcher"
@@ -209,6 +226,65 @@ function setup_backgrounds() {
         echo "Background setup completed. Please restart your X session to apply changes."
     fi
 }
+
+# network monitoring tool
+function setup_ossec() {
+    echo "Setting up OSSEC configuration..."
+    echo -e "$CNT - copying ossec config ..."
+    sudo mkdir -p /var/ossec/etc/
+    sudo cp -f -u -R configs/ossec/* /var/ossec/etc/
+
+    echo "Enabling and starting OSSEC service..."
+    sudo systemctl enable ossec
+    sudo systemctl start ossec
+
+    echo "OSSEC setup complete. Please review the configuration file (/var/ossec/etc/ossec.conf) and adjust as necessary."
+}
+
+# Function to configure Suricata
+function  setup_suricata() {
+    echo "Configuring Suricata..."
+
+    # Create configuration directory if it doesn't exist
+    sudo mkdir -p /etc/suricata
+
+    echo -e "$CNT - copying ossec config ..."
+    sudo mkdir -p /etc/suricata/
+    sudo cp -f -u -R configs/suricata/* /etc/suricata/
+
+    echo "Starting Suricata..."
+    sudo systemctl start suricata
+    sudo systemctl enable suricata
+    echo "Suricata service started."
+}
+
+# Function to harden Arch Linux
+function harden_system() {
+    echo "Configuring UFW..."
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+    # Enable and start UFW
+    sudo systemctl enable ufw
+    sudo systemctl start ufw
+
+    echo "Configuring Fail2Ban..."
+    sudo systemctl enable fail2ban
+    sudo systemctl start fail2ban
+
+    echo "Configuring Auditd..."
+    sudo systemctl enable auditd
+    sudo systemctl start auditd
+
+    setup_ossec
+    setup_suricata
+
+    echo "System hardening complete."
+    # to monitor
+    # sudo tail -f /var/log/ufw.log
+    # sudo tail -f /var/log/fail2ban.log
+    # sudo tail -f /var/log/audit/audit.log
+}
+
 
 function configure_quet_systemd_boot() {
   # Get the UUID of the root partition
@@ -617,14 +693,8 @@ function set_nvim_colorscheme_to_moonfly() {
 function setup_picom() {
     # Add picom startup command to $HOME/.xprofile if not already present
     # Source and destination paths
-    src_file=$HOME/.config/configs/picom/picom.conf
+    src_file=configs/picom/picom.conf
     dest_file=$HOME/.config/picom.conf
-
-    # Check if the destination file already exists
-    if [ -f "$dest_file" ]; then
-        # Remove the existing file before creating the symbolic link
-        rm -f "$dest_file"
-    fi
 
     # Create the symbolic link
     cp -f "$src_file" "$dest_file"
@@ -654,6 +724,7 @@ function is_vm() {
     fi
 }
 
+# TODO, maybe move this to DWMBLocks doing all the checks and hybernate?
 function setup_video_hibernation() {
     # Step 1: Create the monitor script
     sudo tee /usr/local/bin/monitor_video.sh > /dev/null << 'EOF'
@@ -715,49 +786,6 @@ function add_dunst_to_autostart() {
     echo "Dunst has been added to $xprofile for autostart."
 }
 
-# Function definition
-function link_all_scripts() {
-    local source_dir="$1"
-    local target_dir="$2"
-
-    # Check if source_dir exists and is a directory
-    if [ ! -d "$source_dir" ]; then
-        echo "[ERROR] Source directory '$source_dir' does not exist."
-        return 1
-    fi
-
-    # Check if target_dir exists and is a directory
-    if [ ! -d "$target_dir" ]; then
-        echo "[ERROR] Target directory '$target_dir' does not exist."
-        return 1
-    fi
-
-    local CNT=0
-    local ERROR_FLAG=0
-
-    # Loop through all files in source_dir and create symlinks in target_dir
-    for file in "$source_dir"/*; do
-        if [ -f "$file" ]; then
-            local file_name=$(basename "$file")
-            sudo ln -sf "$file" "$target_dir/$file_name"
-            if [ $? -ne 0 ]; then
-                echo "[ERROR] Failed to link '$file_name' to '$target_dir'"
-                ERROR_FLAG=1
-            else
-                echo "[OK] Linked '$file_name' to '$target_dir'"
-                ((CNT++))
-            fi
-        fi
-    done
-
-    if [ $ERROR_FLAG -ne 0 ]; then
-        echo "[ERROR] Some files could not be linked."
-        return 1
-    else
-        echo "Linking completed successfully."
-    fi
-}
-
 # Function to ask for sudo password once
 ask_for_sudo() {
     # Prompt for sudo password once
@@ -807,25 +835,52 @@ fi
 # yay -R --noconfirm xdg-desktop-portal-gnome xdg-desktop-portal-gtk &>> $INSTLOG
 # configure_quet_systemd_boot
 
-make_scripts_executable "configs/scripts"
 
-sudo cp -f "$HOME/.config/scripts/autostart.sh" "$HOME/.local/share/dwm/autostart.sh"
-
-echo -e "$CNT - Copying config files..."
-# copy the configs directory
-sudo cp -R -f configs "$HOME/.config/"
+# all patches that are on
+#define BAR_DWMBLOCKS_PATCH 1
+#define BAR_LTSYMBOL_PATCH 1
+#define BAR_STATUS_PATCH 1
+#define BAR_STATUSCMD_PATCH 1
+#define BAR_TAGS_PATCH 1
+#define BAR_UNDERLINETAGS_PATCH 1
+#define BAR_WINTITLE_PATCH
+#define BAR_ALPHA_PATCH 1
+#define BAR_CENTEREDWINDOWNAME_PATCH 1
+#define BAR_HEIGHT_PATCH 1
+#define BAR_PADDING_PATCH 1
+#define BAR_PADDING_VANITYGAPS_PATCH 1
+#define ALT_TAB_PATCH 1
+#define ALWAYSCENTER_PATCH 1
+#define AUTOSTART_PATCH 1
+#define AUTORESIZE_PATCH 1
+#define INPLACEROTATE_PATCH 1
+#define PERTAG_PATCH 1
+#define PERTAGBAR_PATCH 1
+#define ROUNDED_CORNERS_PATCH 1
+#define VANITYGAPS_PATCH 1
+#define TILE_LAYOUT 1
+#define MONOCLE_LAYOUT 1
+compile_app dwm
+compile_app dwmblocks
+compile_app slock
 
 # ********************************************************************
 # Config files 
 # ********************************************************************
-echo -e "$CNT - Setting up the new config..." 
+make_scripts_executable "configs/scripts"
 
-mkdir -p $HOME/.config/rofi
-sudo cp -Rf $HOME/.config/configs/rofi/* $HOME/.config/rofi/
+echo -e "$CNT - Copying config files..."
+sudo cp -R -f configs "$HOME/.config/"
 
-echo -e "$CNT - linking scripts to bin do dwmblocks could access them..."
-# link_all_scripts "$HOME/.config/configs/scripts" "/usr/local/bin"
+echo -e "$CNT - Copying all scripts to /usr/local/bin..."
 sudo cp -Rf configs/scripts/* /usr/local/bin/
+
+echo -e "$CNT - Copying autostart.sh..."
+sudo cp -f "configs/scripts/autostart.sh" "$HOME/.local/share/dwm/autostart.sh"
+
+echo -e "$CNT - Copying rofi config..." 
+sudo mkdir -p $HOME/.config/rofi
+sudo cp -Rf $HOME/.config/configs/rofi/* $HOME/.config/rofi/
 
 echo -e "$CNT - Copy dunst config..."
 sudo mkdir -p $HOME/.config/dunst/
@@ -840,15 +895,13 @@ sudo mkdir -p $HOME/.config/mc/
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
-compile_app slock
-compile_app dwm
-compile_app dwmblocks
 setup_backgrounds
 add_dunst_to_autostart
 setup_slock_for_dwm
 setup_hibernation_after_idle
 setup_picom
 setup_video_hibernation
+harden_system
 
 
 # ********************************************************************
@@ -877,8 +930,8 @@ echo -e "$CNT - Updating .bashrc..."
 add_if_not_exists 'eval "$(starship init bash)"' $HOME/.bashrc
 add_if_not_exists 'eval "$(starship init zsh)"' $HOME/.zshrc
 echo -e "$CNT - copying starship config file to $HOME/.config ..."
-mkdir -p $HOME/.config
-cp -f -u configs/starship/starship.toml $HOME/.config/
+sudo mkdir -p $HOME/.config
+sudo cp -f -u configs/starship/starship.toml $HOME/.config/
 
 # ********************************************************************
 # sddm section

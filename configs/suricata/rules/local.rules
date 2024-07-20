@@ -1,0 +1,16 @@
+# Suricata Local Rules
+
+# Detecting ARP Spoofing / Poisoning (MitM)
+alert arp any any -> any any (msg:"ARP Spoofing detected"; arp_spa:!0.0.0.0; arp_tpa:!0.0.0.0; sid:100001; classtype:attempted-recon; priority:1;)
+
+# Detecting DHCP Spoofing (MitM)
+alert udp any any -> any 67 (msg:"DHCP Spoofing detected"; content:"|01 01 06 00|"; offset:0; depth:4; classtype:attempted-recon; sid:100002; priority:1;)
+
+# Detecting SSL/TLS MITM using self-signed certificates
+alert tls any any -> any any (msg:"Self-signed certificate detected"; tls.cert.issuer:"CN=Self-Signed"; classtype:policy-violation; sid:100003; priority:1;)
+
+# Detecting SSL/TLS MITM using expired certificates
+alert tls any any -> any any (msg:"Expired SSL/TLS certificate detected"; tls.cert.notafter:<2022-01-01; classtype:policy-violation; sid:100004; priority:1;)
+
+# Detecting DNS Spoofing (MitM)
+alert dns any any -> any any (msg:"DNS Spoofing detected"; dns.query; content:"example.com"; classtype:attempted-recon; sid:100005; priority:1;)
