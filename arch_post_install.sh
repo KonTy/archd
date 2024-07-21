@@ -85,7 +85,8 @@ declare -A prep_stage=(
     [ufw]="Uncomplicated Firewalll"
     [fail2ban]="ban clients that try to connect several times"
     [audit]="Audit nextwork and system"
-    [suricate]="Comprehensive network intrusion detection tool"
+    [rust]="rust libs"
+    [suricata]="Comprehensive network intrusion detection tool"
     [ossec-hids-local]="Virus/Intrusion detection tool"
     [fzf-git]="Fuzzy finder for terminal"
 )
