@@ -56,7 +56,6 @@ ISNVIDIA=false
 declare -A prep_stage=(
     [base-devel]="Base development tools"
     [git]="Version control system"
-    [gcc]="Compiler"
     [make]="Make"
     [libxext]="This library is for window effects for DWM"
     [libxrandr]="Provides an X Window System extension for dynamic resizing and rotation of X screen"
@@ -88,6 +87,7 @@ declare -A prep_stage=(
     [audit]="Audit nextwork and system"
     [suricata]="Comprehensive network intrusion detection tool"
     [ossec-hids-local]="Virus/Intrusion detection tool"
+    [fzf-git]="Fuzzy finder for terminal"
 )
 
 #     [calcurse-git]="CLI calendar"
@@ -134,6 +134,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+    [gcc]="Compiler"
     [pamixer]="Pulseaudio command-line mixer like amixer"
     [pavucontrol]="PulseAudio Volume Control"
     [pipewire-jack]="JACK support for PipeWire"
