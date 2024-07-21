@@ -86,7 +86,6 @@ declare -A prep_stage=(
     [fail2ban]="ban clients that try to connect several times"
     [audit]="Audit nextwork and system"
     [ossec-hids-local]="Virus/Intrusion detection tool"
-    [fzf-git]="Fuzzy finder for terminal"
 )
 
 #     [calcurse-git]="CLI calendar"
@@ -133,6 +132,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+    [fzf-git]="Fuzzy finder for terminal"
     [rust]="rust libs"
     [suricata]="Comprehensive network intrusion detection tool"
     [gcc]="Compiler"
@@ -954,7 +954,7 @@ add_dunst_to_autostart
 setup_slock_for_dwm
 setup_hibernation_after_idle
 setup_picom
-setup_fzf
+#setup_fzf
 setup_video_hibernation
 harden_system
 
