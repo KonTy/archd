@@ -81,7 +81,6 @@ declare -A prep_stage=(
     [networkmanager]="Network Manager"
     [dunst]="Lightweight notification service"
     [libnotify]="command-line utility on Linux systems used to send desktop notifications"
-    [eww]="Bar for dwm"
     [ossec-hids-local]="Virus/Intrusion detection tool"
 )
 
@@ -129,6 +128,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+        [eww]="Bar for dwm"
     [audit]="Audit nextwork and system"    
     [fail2ban]="ban clients that try to connect several times"
     [ufw]="Uncomplicated Firewalll"
@@ -949,7 +949,7 @@ sudo mkdir -p $HOME/.config/mc/
 sudo cp -f -u $HOME/.config/configs/mc/ini $HOME/.config/mc/ini 
 sudo cp -f -u $HOME/.config/configs/mc/darkened.ini /usr/share/mc/skins/darkened.ini
 
-setup_backgrounds
+# setup_backgrounds
 add_dunst_to_autostart
 setup_slock_for_dwm
 setup_hibernation_after_idle
