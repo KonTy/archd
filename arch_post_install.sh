@@ -260,6 +260,58 @@ function  setup_suricata() {
     echo "Suricata service started."
 }
 
+function setup_fzf() {
+    # Install fzf using pacman
+    if ! command -v fzf &> /dev/null; then
+        echo "Installing fzf..."
+        sudo pacman -S fzf --noconfirm
+    else
+        echo "fzf is already installed."
+    fi
+
+    # Define the necessary aliases and functions
+    fzf_setup_script=$(cat <<'EOF'
+# Aliases for fzf
+alias ff='find . -type f | fzf'
+alias fh='history | fzf'
+
+# Git integration with fzf
+gfb() {
+    git branch --all | fzf --preview 'echo {} | sed "s/^..//" | xargs -I % git log --oneline -n 10 %'
+}
+
+gfc() {
+    git log --oneline | fzf --preview 'echo {} | awk "{print \$1}" | xargs -I % git show --stat %'
+}
+
+gff() {
+    git ls-files | fzf
+}
+
+# Customizing fzf
+export FZF_DEFAULT_OPTS='--height 40% --border --ansi'
+EOF
+    )
+
+    # Append the setup script to the shell configuration file if not already present
+    if ! grep -q 'fzf setup' ~/.bashrc; then
+        echo "Adding fzf setup to ~/.bashrc"
+        echo -e "\n# fzf setup\n$fzf_setup_script" >> ~/.bashrc
+    fi
+
+    if ! grep -q 'fzf setup' ~/.zshrc; then
+        echo "Adding fzf setup to ~/.zshrc"
+        echo -e "\n# fzf setup\n$fzf_setup_script" >> ~/.zshrc
+    fi
+
+    # Reload the shell configuration
+    echo "Reloading shell configuration..."
+    source ~/.bashrc 2> /dev/null || true
+    source ~/.zshrc 2> /dev/null || true
+
+    echo "fzf setup completed."
+}
+
 # Function to harden Arch Linux
 function harden_system() {
     echo "Configuring UFW..."
@@ -902,6 +954,7 @@ add_dunst_to_autostart
 setup_slock_for_dwm
 setup_hibernation_after_idle
 setup_picom
+setup_fzf
 setup_video_hibernation
 harden_system
 
