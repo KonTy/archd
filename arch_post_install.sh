@@ -924,12 +924,15 @@ compile_app slock
 make_scripts_executable "configs/scripts"
 
 echo -e "$CNT - Copying config files..."
+sudo mkdir -p "$HOME/.config/"
 sudo cp -R -f configs "$HOME/.config/"
 
 echo -e "$CNT - Copying all scripts to /usr/local/bin..."
+sudo mkdir -p /usr/local/bin/
 sudo cp -Rf configs/scripts/* /usr/local/bin/
 
 echo -e "$CNT - Copying autostart.sh..."
+sudo mkdir -p $HOME/.local/share/dwm/
 sudo cp -f "configs/scripts/autostart.sh" "$HOME/.local/share/dwm/autostart.sh"
 
 echo -e "$CNT - Copying rofi config..." 
