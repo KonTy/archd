@@ -82,7 +82,6 @@ declare -A prep_stage=(
     [dunst]="Lightweight notification service"
     [libnotify]="command-line utility on Linux systems used to send desktop notifications"
     [eww]="Bar for dwm"
-    [ufw]="Uncomplicated Firewalll"
     [fail2ban]="ban clients that try to connect several times"
     [audit]="Audit nextwork and system"
     [ossec-hids-local]="Virus/Intrusion detection tool"
@@ -132,6 +131,7 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
+    [ufw]="Uncomplicated Firewalll"
     [fzf-git]="Fuzzy finder for terminal"
     [rust]="rust libs"
     [suricata]="Comprehensive network intrusion detection tool"
@@ -314,12 +314,12 @@ EOF
 
 # Function to harden Arch Linux
 function harden_system() {
-    echo "Configuring UFW..."
-    sudo ufw default deny incoming
-    sudo ufw default allow outgoing
-    # Enable and start UFW
-    sudo systemctl enable ufw
-    sudo systemctl start ufw
+    # echo "Configuring UFW..."
+    # sudo ufw default deny incoming
+    # sudo ufw default allow outgoing
+    # # Enable and start UFW
+    # sudo systemctl enable ufw
+    # sudo systemctl start ufw
 
     echo "Configuring Fail2Ban..."
     sudo systemctl enable fail2ban
