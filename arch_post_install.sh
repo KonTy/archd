@@ -81,7 +81,6 @@ declare -A prep_stage=(
     [networkmanager]="Network Manager"
     [dunst]="Lightweight notification service"
     [libnotify]="command-line utility on Linux systems used to send desktop notifications"
-    [ossec-hids-local]="Virus/Intrusion detection tool"
 )
 
 #     [calcurse-git]="CLI calendar"
@@ -128,7 +127,8 @@ declare -A install_stage=(
 )
 
 declare -A optional_stage=(
-        [eww]="Bar for dwm"
+    [ossec-hids-local]="Virus/Intrusion detection tool"    
+    [eww]="Bar for dwm"
     [audit]="Audit nextwork and system"    
     [fail2ban]="ban clients that try to connect several times"
     [ufw]="Uncomplicated Firewalll"
@@ -314,20 +314,20 @@ EOF
 
 # Function to harden Arch Linux
 function harden_system() {
-    # echo "Configuring UFW..."
-    # sudo ufw default deny incoming
-    # sudo ufw default allow outgoing
-    # # Enable and start UFW
-    # sudo systemctl enable ufw
-    # sudo systemctl start ufw
+    echo "Configuring UFW..."
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+    # Enable and start UFW
+    sudo systemctl enable ufw
+    sudo systemctl start ufw
 
-    # echo "Configuring Fail2Ban..."
-    # sudo systemctl enable fail2ban
-    # sudo systemctl start fail2ban
+    echo "Configuring Fail2Ban..."
+    sudo systemctl enable fail2ban
+    sudo systemctl start fail2ban
 
-    # echo "Configuring Auditd..."
-    # sudo systemctl enable auditd
-    # sudo systemctl start auditd
+    echo "Configuring Auditd..."
+    sudo systemctl enable auditd
+    sudo systemctl start auditd
 
     setup_ossec
     #setup_suricata
@@ -956,7 +956,7 @@ setup_hibernation_after_idle
 setup_picom
 #setup_fzf
 setup_video_hibernation
-harden_system
+#harden_system
 
 
 # ********************************************************************
